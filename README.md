@@ -6,11 +6,11 @@ Este repositorio contiene el progreso y la documentación de mi aprendizaje sobr
 
 ## 📑 Tabla de Contenidos
 
-- [📝 Descripción](#📝-descripción)
-- [🛠️ Prerrequisitos](#🛠️-prerrequisitos)
-- [📂 Estructura del Repositorio](#📂-estructura-del-repositorio)
-- [⚡ Guía Rápida (Quickstart)](#⚡-guía-rápida-quickstart)
-- [🔍 Próximos Pasos](#🔍-próximos-pasos)
+- [📝 Descripción](#-descripción)
+- [🛠️ Prerrequisitos](#%EF%B8%8F-prerrequisitos)
+- [📂 Estructura del Repositorio](#-estructura-del-repositorio)
+- [⚡ Guía Rápida (Quickstart)](#-guía-rápida-quickstart)
+- [🔍 Próximos Pasos](#-próximos-pasos)
 
 ## 🛠️ Prerrequisitos
 

@@ -1,7 +1,7 @@
-# MLOps: Introducción y Conceptos Fundamentales
+# 📚 MLOps: Introducción y Conceptos Fundamentales
 
 
-## 📚 Descripción
+## 📝 Descripción
 
 Este documento proporciona una introducción a MLOps (Machine Learning Operations), sus conceptos teóricos, arquitecturas, herramientas y tecnologías relacionadas. Está diseñado para servir como un recurso introductorio y de consulta rápida para nuevos miembros del equipo interesados en la implementación de flujos de trabajo de aprendizaje automático eficientes y escalables.
 

@@ -1,6 +1,6 @@
 # ⚡ Airflow Quickstart - Versión 2.10.5
 
-## 🚀 Descripción
+## 📝 Descripción
 
 Este entorno de `quickstart-airflow` está diseñado para facilitar la instalación y configuración rápida de Apache Airflow en Windows utilizando Docker. Está basado en la versión **2.10.5** de Apache Airflow y permite experimentar con DAGs personalizados o con los ejemplos predeterminados de Airflow.
 
@@ -10,17 +10,17 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 
 ## 📑 Tabla de Contenidos
 
-- [🚀 Descripción](#🚀-descripción)
-- [🛠️ Requisitos Previos](#🛠️-requisitos-previos)
-- [📂 Estructura de Carpetas](#📂-estructura-de-carpetas)
+- [📝 Descripción](#-descripción)
+- [🛠️ Requisitos Previos](#%EF%B8%8F-requisitos-previos)
+- [📂 Estructura de Carpetas](#-estructura-de-carpetas)
 - [🚦 Configuración Inicial](#🚦-configuración-inicial)
-- [▶️ Iniciar el Entorno de Apache Airflow](#️▶️-iniciar-el-entorno-de-apache-airflow)
-- [📋 Mensajes de Éxito Esperados](#📋-mensajes-de-éxito-esperados)
-- [✅ Verificar el Estado de los Servicios](#✅-verificar-el-estado-de-los-servicios)
-- [🌐 Acceder a la Interfaz Web](#🌐-acceder-a-la-interfaz-web)
-- [🛑 Detener el Entorno](#🛑-detener-el-entorno)
-- [🧹 Eliminar Contenedores y Volúmenes](#🧹-eliminar-contenedores-y-volúmenes)
-- [💻 Uso de VSCode con Dev Containers](#💻-uso-de-vscode-con-dev-containers)
+- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
+- [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
+- [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
+- [🌐 Acceder a la Interfaz Web](#-acceder-a-la-interfaz-web)
+- [🛑 Detener el Entorno](#-detener-el-entorno)
+- [🧹 Eliminar Contenedores y Volúmenes](#-eliminar-contenedores-y-volúmenes)
+- [💻 Uso de VSCode con Dev Containers](#-uso-de-vscode-con-dev-containers)
 
 
 

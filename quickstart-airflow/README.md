@@ -2,23 +2,46 @@
 
 ## 🚀 Descripción
 
-Este entorno de `airflow-quickstart` está diseñado para facilitar la instalación y configuración rápida de Apache Airflow en Windows utilizando Docker. Está basado en la versión **2.10.5** de Apache Airflow y permite experimentar con DAGs personalizados o con los ejemplos predeterminados de Airflow.
+Este entorno de `quickstart-airflow` está diseñado para facilitar la instalación y configuración rápida de Apache Airflow en Windows utilizando Docker. Está basado en la versión **2.10.5** de Apache Airflow y permite experimentar con DAGs personalizados o con los ejemplos predeterminados de Airflow.
 
-⚠️ **Nota:** Este entorno es únicamente para fines de experimentación y aprendizaje. No debe ser utilizado en entornos de producción.
+> [!IMPORTANT]
+> Este entorno es únicamente para fines de experimentación y aprendizaje. No debe ser utilizado en entornos de producción.
 
----
+
+## 📑 Tabla de Contenidos
+
+- [🚀 Descripción](#🚀-descripción)
+- [🛠️ Requisitos Previos](#🛠️-requisitos-previos)
+- [📂 Estructura de Carpetas](#📂-estructura-de-carpetas)
+- [🚦 Configuración Inicial](#🚦-configuración-inicial)
+- [▶️ Iniciar el Entorno de Apache Airflow](#️▶️-iniciar-el-entorno-de-apache-airflow)
+- [📋 Mensajes de Éxito Esperados](#📋-mensajes-de-éxito-esperados)
+- [✅ Verificar el Estado de los Servicios](#✅-verificar-el-estado-de-los-servicios)
+- [🌐 Acceder a la Interfaz Web](#🌐-acceder-a-la-interfaz-web)
+- [🛑 Detener el Entorno](#🛑-detener-el-entorno)
+- [🧹 Eliminar Contenedores y Volúmenes](#🧹-eliminar-contenedores-y-volúmenes)
+- [💻 Uso de VSCode con Dev Containers](#💻-uso-de-vscode-con-dev-containers)
+
+
 
 ## 🛠️ Requisitos Previos
 
 - Tener **Docker** y **Docker Compose** instalados en tu PC. (Docker Desktop ya incluye Docker Compose).
 
----
+Si aun no lo tienes dirigete a [Docker Desktop](https://www.docker.com/products/docker-desktop) y sigue las instrucciones de instalación según tu sistema operativo.
+
+
 
 ## 📂 Estructura de Carpetas
 
 ```
-airflow-quickstart/
-├─ dags/                  # Ejemplos de DAGs o DAGs personalizados
+quickstart-airflow/
+├─ dags/                        # Ejemplos de DAGs
+│   ├─ dag_hello_world.py       # Ejemplo básico con PythonOperator
+│   ├─ dag_bash_operator.py     # Ejemplo con BashOperator
+│   ├─ dag_dependencies.py      # Ejemplo con dependencias entre tareas
+│   └─ README.md                # Cómo usar VSCode con Dev Containers
+|
 ├─ plugins/               # Plugins personalizados (si son necesarios)
 ├─ config/                # Archivos de configuración (en gitignore)
 ├─ logs/                  # Carpeta de logs (en gitignore)
@@ -27,18 +50,24 @@ airflow-quickstart/
 └─ README.md              # Instrucciones detalladas del quickstart
 ```
 
----
+> [!NOTE]
+> Las carpetas `plugins`, `config`, `logs` y el archivo `.env` no están presentes en el repositorio debido a que:
+> - `plugins/`, `config/`, y `logs/` deben ser generados localmente antes de iniciar el entorno.
+> - `.env` contiene información de configuración específica del entorno local.  
+> Estos elementos están incluidos en el `.gitignore` para evitar problemas de seguridad y asegurar una configuración adecuada en cada entorno.
+
+
 
 ## 🚦 Configuración Inicial
 
-1. Navega a la carpeta `airflow-quickstart`:
+1. Navega a la carpeta `quickstart-airflow`:
 
 ```bash
-cd workspace/airflow-quickstart
+cd workspace/quickstart-airflow
 ```
 
 2. Crea las carpetas necesarias y el archivo `.env`:
-
+   
 ```bash
 mkdir dags plugins config logs
 
@@ -54,24 +83,28 @@ En el archivo `docker-compose.yaml`, puedes habilitar o deshabilitar la carga de
 AIRFLOW__CORE__LOAD_EXAMPLES: 'true' # Cambia a 'false' para no cargar ejemplos
 ```
 
----
 
-## 🚀 Iniciar el Entorno de Apache Airflow
+
+## ▶️ Iniciar el Entorno de Apache Airflow
 
 Ejecuta el siguiente comando para inicializar Apache Airflow:
-*❕ Solo ejecutar este comando la primera vez*
 ```bash
 # Inicializar la base de datos y servicios
 docker compose up airflow-init
 ```
+> [!NOTE]
+> Solo es necesario ejecutar este comando la primera vez que inicializas el entorno.
 
 Ejecuta el siguiente comando para ejecutar Apache Airflow :
 ```bash
 # Iniciar todos los servicios en segundo plano
 docker compose up -d
 ```
-*Nota: la bandera `-d` es `--detach` para ejecutarlo en segundo plano y evitar llenar de logs la terminal*
----
+
+>[!TIP] 
+> Utilice la bandera `-d` o `--detach` para ejecutar el compose de Apache Airflow en segundo plano y tener una terminal mas limpia.
+
+
 
 ## 📋 Mensajes de Éxito Esperados
 
@@ -83,7 +116,7 @@ Durante la inicialización, deberías ver mensajes como:
 
 Si todo está en orden, podrás acceder a la interfaz web y ver los DAGs cargados.
 
----
+
 
 ## ✅ Verificar el Estado de los Servicios
 
@@ -105,7 +138,7 @@ ed9b09fc84b1   apache/airflow:2.10.5   "/usr/bin/dumb-init …"   3 minutes ago 
 
 Asegúrate de que todos los servicios estén en estado **healthy**.
 
----
+
 
 ## 🌐 Acceder a la Interfaz Web
 
@@ -118,16 +151,15 @@ Asegúrate de que todos los servicios estén en estado **healthy**.
 - **Usuario:** airflow
 - **Contraseña:** airflow
 
----
 
-## Detener el Entorno
+
+## 🛑 Detener el Entorno
 
 Para detener la ejecución del entorno utiliza el siguiente comando:
 ```bash
 docker compose down
 ```          
 
----
 
 ## 🧹 Eliminar Contenedores y Volúmenes
 
@@ -135,11 +167,13 @@ docker compose down
 ```bash
 docker compose down --volumes --remove-orphans
 ```          
-⚠️ **Advertencia:** Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
+> [!CAUTION] 
+> Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
 
 
 - Si ya no necesitas el entorno y deseas limpiar todos los contenedores y volúmenes asociados, ejecuta el siguiente comando:
 ```bash
-docker compose down --volumes --rmi all
+docker compose down --volumes -remove-orphans --rmi all
 ```
-⚠️ **Advertencia:** Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
+>[!CAUTION] 
+> Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.

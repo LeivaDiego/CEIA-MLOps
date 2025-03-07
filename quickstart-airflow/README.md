@@ -14,13 +14,15 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 - [🛠️ Requisitos Previos](#%EF%B8%8F-requisitos-previos)
 - [📂 Estructura de Carpetas](#-estructura-de-carpetas)
 - [🚦 Configuración Inicial](#-configuración-inicial)
-- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
+- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
 - [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
 - [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
 - [🌐 Acceder a la Interfaz Web](#-acceder-a-la-interfaz-web)
 - [🛑 Detener el Entorno](#-detener-el-entorno)
 - [🧹 Eliminar Contenedores y Volúmenes](#-eliminar-contenedores-y-volúmenes)
 - [💻 Uso de VSCode con Dev Containers](#-uso-de-vscode-con-dev-containers)
+  - [🔧 Requisitos Previos](#️-requisitos-previos)
+  - [⚙️ Pasos para Configurar el Dev Container](#️%EF%B8%8F-pasos-para-configurar-el-dev-container)
 
 
 
@@ -46,6 +48,7 @@ quickstart-airflow/
 ├─ config/                # Archivos de configuración (en gitignore)
 ├─ logs/                  # Carpeta de logs (en gitignore)
 ├─ docker-compose.yaml    # Archivo de configuración Docker
+├─ Dockerfile             # Archivo básico de docker para airflow
 ├─ .env                   # Variables de entorno necesarias
 └─ README.md              # Instrucciones detalladas del quickstart
 ```
@@ -195,7 +198,7 @@ docker compose down --volumes --remove-orphans --rmi all
 
 4. **Archivo `docker-compose.yaml` oficial de Apache Airflow:** Descargable desde el [repositorio oficial](https://github.com/apache/airflow).
 
-### 🚀 Pasos para Configurar el Dev Container
+### ⚙️ Pasos para Configurar el Dev Container
 
 1. **Crear un Dockerfile:** En el mismo directorio donde está el `docker-compose.yaml`, crea un archivo `Dockerfile` con el siguiente contenido mínimo:
 > [!NOTE]

@@ -13,7 +13,7 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 - [📝 Descripción](#-descripción)
 - [🛠️ Requisitos Previos](#%EF%B8%8F-requisitos-previos)
 - [📂 Estructura de Carpetas](#-estructura-de-carpetas)
-- [🚦 Configuración Inicial](#🚦-configuración-inicial)
+- [🚦 Configuración Inicial](#-configuración-inicial)
 - [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
 - [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
 - [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
@@ -151,7 +151,8 @@ Asegúrate de que todos los servicios estén en estado **healthy**.
 - **Usuario:** airflow
 - **Contraseña:** airflow
 
-
+Deberías de ver algo como esto:
+![alt text](screenshots/airflow-gui.png)
 
 ## 🛑 Detener el Entorno
 
@@ -173,7 +174,66 @@ docker compose down --volumes --remove-orphans
 
 - Si ya no necesitas el entorno y deseas limpiar todos los contenedores y volúmenes asociados, ejecuta el siguiente comando:
 ```bash
-docker compose down --volumes -remove-orphans --rmi all
+docker compose down --volumes --remove-orphans --rmi all
 ```
 >[!CAUTION] 
 > Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
+
+
+
+## 💻 Uso de VSCode con Dev Containers
+
+> [!TIP]
+> Para tener una mejor experiencia desarrollando DAGs, sigue los pasos a continuación para utilizar la extensión de `Dev Containers` de *VSCode* para poder tener acceso a Airflow dentro del entorno de Docker.
+
+### 📌 Requisitos Previos
+
+1. **Docker Desktop:** Instalar Docker desde [Docker Hub](https://www.docker.com/products/docker-desktop).
+2. **Visual Studio Code (VS Code):** Descargar desde [Visual Studio Code](https://code.visualstudio.com/).
+3. **Extensión Dev Containers:** Instalar la extensión oficial de Microsoft: `Dev Containers` en VS Code.
+   ![alt text](screenshots/dev-containers-ext.png)
+
+4. **Archivo `docker-compose.yaml` oficial de Apache Airflow:** Descargable desde el [repositorio oficial](https://github.com/apache/airflow).
+
+### 🚀 Pasos para Configurar el Dev Container
+
+1. **Crear un Dockerfile:** En el mismo directorio donde está el `docker-compose.yaml`, crea un archivo `Dockerfile` con el siguiente contenido mínimo:
+> [!NOTE]
+> Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
+
+
+```dockerfile
+FROM apache/airflow:<version>
+# Ejemplo: FROM apache/airflow:2.10.5-python3.8
+```
+
+1. **Agregar Configuración de Dev Container:**
+   - Abre VS Code y navega a la paleta de comandos (`Ctrl + Shift + P`).
+   - Escribe `Dev Containers: Add Development Container Configuration Files`.
+   - Selecciona `Add configuration to workspace` para crear en el directorio de trabajo la carpeta de configuraciones
+   - Selecciona `From Dockerfile` y elige elementos adicionales si lo deseas o solo da en `ok`.
+  
+
+2. **Reabrir en el Contenedor:**
+   - Nuevamente, usa `Ctrl + Shift + P`, escribe `Dev Containers: Reopen in Container` y selecciónalo.
+   - VS Code construirá el contenedor y se abrirá en una nueva ventana.
+> [!IMPORTANT]
+> El proceso puede tardar unos minutos en lo que se descargan los elementos necesarios para la conexión remota.
+
+
+3. **Instalar la Extensión de Python:**
+   - Abre el panel de extensiones en VS Code, busca `Python` y selecciona `Install in Dev Container` para habilitar el Intellisense.
+
+4. **Seleccionar el Intérprete de Python:**
+   - Haz clic en la barra inferior izquierda (`Select Python Interpreter`) y elige el intérprete del entorno Docker (En este caso python 3.8).
+
+5. **Abrir una Terminal Local:**
+   - Usa `Ctrl + Shift + P` y selecciona `Create New Integrated Terminal (Local)`.
+> [!TIP]
+> Este paso es opcional si quieres tener acceso a una terminal de tu máquina local y no del contenedor, pero es muy útil para reiniciar el contenedor del webserver para actualizar la vista de los DAGs en la UI de Airflow.
+
+6. **Cerrar el Dev Container:**
+   - Para salir del entorno, usa `Ctrl + Shift + P`, busca `Close Dev Container` y seleccionaló.
+
+> [!NOTE]
+> Si lo deseas, también puedes ignorar los mensajes de advertencia sin que afecte el funcionamiento de Airflow.

@@ -41,7 +41,7 @@ def mi_tarea():
     print('¡Hola, Airflow!')
 
 with DAG('mi_primer_dag',
-         start_date=datetime(2023, 1, 1),
+         start_date=datetime(2025, 1, 1),
          schedule_interval='@daily',
          catchup=False) as dag:
     tarea = PythonOperator(
@@ -95,13 +95,27 @@ echo 'Este es un comando Bash ejecutado desde Airflow'
 cp dags/*.py /ruta/a/airflow-quickstart/dags
 ```
 
+
 2. Reinicia el servidor de Airflow para cargar los nuevos DAGs.
 
 ```bash
 docker compose restart airflow-webserver
 ```
 
+
 3. Accede a la interfaz web de Airflow en [http://localhost:8080](http://localhost:8080) y verifica que los DAGs aparezcan como activos.
+    	
+    Deberías de poder ver alg como esto en tu interfaz web
+
+    ![alt text](../screenshots/simple-dags.png)
+
+
+4. Prueba ejecutar un DAG con la interfaz y comprueba su funcionamiento, para lograrlo navega a cualquiera de los DAGs y presiona el botón de run
+
+    ![alt text](../screenshots/run-dag.png)
+
+    Luego ve a la ventana de graph, selecciona la tarea que deseas verificar y visita logs, ahi deberias de ver la ejecución del DAG
+    ![alt text](../screenshots/dag-log.png)
 
 
 ## 🔗 Referencias

@@ -139,7 +139,7 @@ ed9b09fc84b1   apache/airflow:2.10.5   "/usr/bin/dumb-init …"   3 minutes ago 
 0bd6576d23cb   redis:latest            "docker-entrypoint.s…"   10 hours ago     Up 17 minutes (healthy)   0.0.0.0:6379->6379/tcp             compose_redis_1
 ```
 
-Asegúrate de que todos los servicios estén en estado **healthy**.
+Asegúrate de que todos los servicios estén en estado **healthy**. Si dicen `health: starting`, espera un momento y vuelve a intentar abrir la interfaz.
 
 
 

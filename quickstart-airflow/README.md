@@ -14,15 +14,15 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 - [🛠️ Requisitos Previos](#%EF%B8%8F-requisitos-previos)
 - [📂 Estructura de Carpetas](#-estructura-de-carpetas)
 - [🚦 Configuración Inicial](#-configuración-inicial)
-- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
+- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F%EF%B8%8F%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
 - [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
 - [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
 - [🌐 Acceder a la Interfaz Web](#-acceder-a-la-interfaz-web)
 - [🛑 Detener el Entorno](#-detener-el-entorno)
 - [🧹 Eliminar Contenedores y Volúmenes](#-eliminar-contenedores-y-volúmenes)
 - [💻 Uso de VSCode con Dev Containers](#-uso-de-vscode-con-dev-containers)
-  - [🔧 Requisitos Previos](#️-requisitos-previos)
-  - [⚙️ Pasos para Configurar el Dev Container](#️%EF%B8%8F-pasos-para-configurar-el-dev-container)
+  - [🔧 Pre-requisitos](#-pre-requisitos)
+  - [⚙️ Pasos para Configurar el Dev Container](#️%EF%B8%8F%EF%B8%8F-pasos-para-configurar-el-dev-container)
 
 
 
@@ -39,10 +39,11 @@ Si aun no lo tienes dirigete a [Docker Desktop](https://www.docker.com/products/
 ```
 quickstart-airflow/
 ├─ dags/                        # Ejemplos de DAGs
-│   ├─ dag_hello_world.py       # Ejemplo básico con PythonOperator
-│   ├─ dag_bash_operator.py     # Ejemplo con BashOperator
-│   ├─ dag_dependencies.py      # Ejemplo con dependencias entre tareas
-│   └─ README.md                # Cómo usar VSCode con Dev Containers
+│   ├─ dag_hello_world.py         # Ejemplo inicial de un DAG
+│   ├─ dag_bash_operator.py       # Ejemplo de un DAG con BashOperator
+│   ├─ dag_dependencies.py        # Ejemplo de un DAG con dependencias entre tareas
+│   ├─ dag_branching.py           # Ejemplo de un DAG con ramas
+│   └─ README.md                  # Guía de uso y explicación de los DAGs
 |
 ├─ plugins/               # Plugins personalizados (si son necesarios)
 ├─ config/                # Archivos de configuración (en gitignore)
@@ -90,22 +91,23 @@ AIRFLOW__CORE__LOAD_EXAMPLES: 'true' # Cambia a 'false' para no cargar ejemplos
 
 ## ▶️ Iniciar el Entorno de Apache Airflow
 
-Ejecuta el siguiente comando para inicializar Apache Airflow:
-```bash
-# Inicializar la base de datos y servicios
-docker compose up airflow-init
-```
-> [!NOTE]
-> Solo es necesario ejecutar este comando la primera vez que inicializas el entorno.
+1. Antes de comenzar asegurate de haber ejecutado docker desktop para que este activo el Daemon.
 
-Ejecuta el siguiente comando para ejecutar Apache Airflow :
-```bash
-# Iniciar todos los servicios en segundo plano
-docker compose up -d
-```
+2. Ejecuta el siguiente comando para inicializar Apache Airflow:
+   ```bash
+   # Inicializar la base de datos y servicios
+   docker compose up airflow-init
+   ```
+   > [!NOTE]
+   > Solo es necesario ejecutar este comando la primera vez que inicializas el entorno.
 
->[!TIP] 
-> Utilice la bandera `-d` o `--detach` para ejecutar el compose de Apache Airflow en segundo plano y tener una terminal mas limpia.
+3. Ejecuta el siguiente comando para ejecutar Apache Airflow :
+   ```bash
+   # Iniciar todos los servicios en segundo plano
+   docker compose up -d
+   ```
+   >[!TIP] 
+   > Utilice la bandera `-d` o `--detach` para ejecutar el compose de Apache Airflow en segundo plano y tener una terminal mas limpia.
 
 
 
@@ -146,16 +148,18 @@ Asegúrate de que todos los servicios estén en estado **healthy**. Si dicen `he
 ## 🌐 Acceder a la Interfaz Web
 
 1. Abre tu navegador y dirígete a:
-
-[http://localhost:8080](http://localhost:8080)
+   
+   [http://localhost:8080](http://localhost:8080)
 
 2. Inicia sesión con las credenciales predeterminadas:
+   
+   - **Usuario:** airflow
+   - **Contraseña:** airflow
 
-- **Usuario:** airflow
-- **Contraseña:** airflow
 
-Deberías de ver algo como esto:
-![alt text](screenshots/airflow-gui.png)
+3. Deberías de ver algo como esto:
+
+   ![Airflow GUI](screenshots/airflow-gui.png)
 
 ## 🛑 Detener el Entorno
 
@@ -168,19 +172,19 @@ docker compose down
 ## 🧹 Eliminar Contenedores y Volúmenes
 
 - Si quieres empezar desde 0 otra vez, ejecuta el siguiente comando:
-```bash
-docker compose down --volumes --remove-orphans
-```          
-> [!CAUTION] 
-> Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
+   ```bash
+   docker compose down --volumes --remove-orphans
+   ```          
+   > [!CAUTION] 
+   > Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
 
 
 - Si ya no necesitas el entorno y deseas limpiar todos los contenedores y volúmenes asociados, ejecuta el siguiente comando:
-```bash
-docker compose down --volumes --remove-orphans --rmi all
-```
->[!CAUTION] 
-> Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
+   ```bash
+   docker compose down --volumes --remove-orphans --rmi all
+   ```
+   >[!CAUTION] 
+   > Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
 
 
 
@@ -189,7 +193,7 @@ docker compose down --volumes --remove-orphans --rmi all
 > [!TIP]
 > Para tener una mejor experiencia desarrollando DAGs, sigue los pasos a continuación para utilizar la extensión de `Dev Containers` de *VSCode* para poder tener acceso a Airflow dentro del entorno de Docker.
 
-### 📌 Requisitos Previos
+### 🔧 Pre-requisitos
 
 1. **Docker Desktop:** Instalar Docker desde [Docker Hub](https://www.docker.com/products/docker-desktop).
 2. **Visual Studio Code (VS Code):** Descargar desde [Visual Studio Code](https://code.visualstudio.com/).
@@ -201,14 +205,13 @@ docker compose down --volumes --remove-orphans --rmi all
 ### ⚙️ Pasos para Configurar el Dev Container
 
 1. **Crear un Dockerfile:** En el mismo directorio donde está el `docker-compose.yaml`, crea un archivo `Dockerfile` con el siguiente contenido mínimo:
-> [!NOTE]
-> Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
+   > [!NOTE]
+   > Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
 
-
-```dockerfile
-FROM apache/airflow:<version>
-# Ejemplo: FROM apache/airflow:2.10.5-python3.8
-```
+   ```dockerfile
+   FROM apache/airflow:<version>
+   # Ejemplo: FROM apache/airflow:2.10.5-python3.8
+   ```
 
 1. **Agregar Configuración de Dev Container:**
    - Abre VS Code y navega a la paleta de comandos (`Ctrl + Shift + P`).
@@ -220,8 +223,8 @@ FROM apache/airflow:<version>
 2. **Reabrir en el Contenedor:**
    - Nuevamente, usa `Ctrl + Shift + P`, escribe `Dev Containers: Reopen in Container` y selecciónalo.
    - VS Code construirá el contenedor y se abrirá en una nueva ventana.
-> [!IMPORTANT]
-> El proceso puede tardar unos minutos en lo que se descargan los elementos necesarios para la conexión remota.
+   > [!IMPORTANT]
+   > El proceso puede tardar unos minutos en lo que se descargan los elementos necesarios para la conexión remota.
 
 
 3. **Instalar la Extensión de Python:**
@@ -232,11 +235,10 @@ FROM apache/airflow:<version>
 
 5. **Abrir una Terminal Local:**
    - Usa `Ctrl + Shift + P` y selecciona `Create New Integrated Terminal (Local)`.
-> [!TIP]
-> Este paso es opcional si quieres tener acceso a una terminal de tu máquina local y no del contenedor, pero es muy útil para reiniciar el contenedor del webserver para actualizar la vista de los DAGs en la UI de Airflow.
+   > [!TIP]
+   > Este paso es opcional si quieres tener acceso a una terminal de tu máquina local y no del contenedor, pero es muy útil para reiniciar el contenedor del webserver para actualizar la vista de los DAGs en la UI de Airflow.
 
 6. **Cerrar el Dev Container:**
    - Para salir del entorno, usa `Ctrl + Shift + P`, busca `Close Dev Container` y seleccionaló.
-
-> [!NOTE]
-> Si lo deseas, también puedes ignorar los mensajes de advertencia sin que afecte el funcionamiento de Airflow.
+   > [!NOTE]
+   > Si lo deseas, también puedes ignorar los mensajes de advertencia sin que afecte el funcionamiento de Airflow.

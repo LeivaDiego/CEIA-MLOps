@@ -8,7 +8,7 @@ Esta carpeta contiene ejemplos simples de **DAGs** (Directed Acyclic Graphs) par
 ## 📑 Tabla de Contenidos
 
 - [📝 Descripción](#-descripción)
-- [🧠 ¿Qué es un DAG en Airflow?](#-qué-es-un-dag-en-airflow?)
+- [🧠 ¿Qué es un DAG en Airflow?](#-qué-es-un-dag-en-airflow)
 - [⚙️ Estructura de un DAG](#%EF%B8%8F-estructura-de-un-dag)
 - [🛠️ DAGs Incluidos](#%EF%B8%8F-dags-incluidos)
     - [1. DAG Hello World](#1-dag-hello-world)

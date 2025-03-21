@@ -60,5 +60,5 @@ cat README.md
 
 ## 🔍 Próximos Pasos
 
-- Aprender a utilizar los DAGs con operadores más complejos.
-- Explorar el branching y dependencias dentro de Airflow
+- Aprender a conectar servicios externos a los DAGs
+- Aplicar manejo de errores y monitoreo

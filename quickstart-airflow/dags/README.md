@@ -9,8 +9,8 @@ Esta carpeta contiene ejemplos simples de **DAGs** (Directed Acyclic Graphs) par
 
 - [📝 Descripción](#-descripción)
 - [🧠 ¿Qué es un DAG en Airflow?](#-qué-es-un-dag-en-airflow)
-- [⚙️ Estructura de un DAG](#%EF%B8%8F-estructura-de-un-dag)
-- [🛠️ DAGs Incluidos](#%EF%B8%8F-dags-incluidos)
+- [⚙️ Estructura de un DAG](#️-estructura-de-un-dag)
+- [🛠️ DAGs Incluidos](#️-dags-incluidos)
     - [1. DAG Hello World](#1-dag-hello-world)
     - [2. DAG con BashOperator](#2-dag-con-bashoperator)
     - [3. DAG con dependencias entre tareas](#3-dag-con-dependencias-entre-tareas)

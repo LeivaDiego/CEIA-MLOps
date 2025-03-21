@@ -11,10 +11,10 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 ## 📑 Tabla de Contenidos
 
 - [📝 Descripción](#-descripción)
-- [🛠️ Requisitos Previos](#%EF%B8%8F-requisitos-previos)
+- [🛠️ Requisitos Previos](#️-requisitos-previos)
 - [📂 Estructura de Carpetas](#-estructura-de-carpetas)
 - [🚦 Configuración Inicial](#-configuración-inicial)
-- [▶️ Iniciar el Entorno de Apache Airflow](#️%EF%B8%8F-iniciar-el-entorno-de-apache-airflow)
+- [▶️ Iniciar el Entorno de Apache Airflow](#️-iniciar-el-entorno-de-apache-airflow)
 - [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
 - [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
 - [🌐 Acceder a la Interfaz Web](#-acceder-a-la-interfaz-web)
@@ -22,7 +22,7 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 - [🧹 Eliminar Contenedores y Volúmenes](#-eliminar-contenedores-y-volúmenes)
 - [💻 Uso de VSCode con Dev Containers](#-uso-de-vscode-con-dev-containers)
   - [🔧 Pre-requisitos](#-pre-requisitos)
-  - [⚙️ Pasos para Configurar el Dev Container](#️%EF%B8%8F-pasos-para-configurar-el-dev-container)
+  - [⚙️ Pasos para Configurar el Dev Container](#️-pasos-para-configurar-el-dev-container)
 
 
 

@@ -8,13 +8,13 @@ Este repositorio contiene el progreso y la documentación de mi aprendizaje sobr
 ## 📑 Tabla de Contenidos
 
 - [📝 Descripción](#-descripción)
-- [🛠️ Prerrequisitos](#%EF%B8%8F-prerrequisitos)
+- [🛠️ Pre-requisitos](#️-pre-requisitos)
 - [📂 Estructura del Repositorio](#-estructura-del-repositorio)
 - [⚡ Guía Rápida (Quickstart)](#-guía-rápida-quickstart)
 - [📚 Introducción a MLOps](#-introducción-a-mlops)
 - [🔍 Próximos Pasos](#-próximos-pasos)
 
-## 🛠️ Prerrequisitos
+## 🛠️ Pre-requisitos
 
 - 🐳 Tener Docker y Docker Compose instalados en tu PC. Puedes descargar Docker Desktop (que ya incluye Docker Compose) desde [Docker Desktop](https://www.docker.com/products/docker-desktop) y seguir las instrucciones de instalación según tu sistema operativo.
 

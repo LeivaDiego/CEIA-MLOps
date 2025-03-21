@@ -2,8 +2,7 @@
 
 ## 📝 Descripción
 
-En esta carpeta encontrarás ejemplos de **DAGs** (Directed Acyclic Graphs) básicos diseñados para principiantes en Apache Airflow. Estos DAGs son ideales para aprender y experimentar con los conceptos fundamentales de la automatización de flujos de trabajo.
-
+Esta carpeta contiene ejemplos simples de **DAGs** (Directed Acyclic Graphs) para comenzar a familiarizarte con el uso de Airflow y las bases del funcionamiento de un DAG. Estos DAGs son básicos y estan diseñados para que funcionen con el entorno por defecto proporcionado en el **Quickstart**. Por lo que no es necesario instalar dependencias adicionales.
 
 
 ## 📑 Tabla de Contenidos
@@ -12,6 +11,10 @@ En esta carpeta encontrarás ejemplos de **DAGs** (Directed Acyclic Graphs) bás
 - [🧠 ¿Qué es un DAG en Airflow?](#-qué-es-un-dag-en-airflow?)
 - [⚙️ Estructura de un DAG](#%EF%B8%8F-estructura-de-un-dag)
 - [🛠️ DAGs Incluidos](#%EF%B8%8F-dags-incluidos)
+    - [1. DAG Hello World](#1-dag-hello-world)
+    - [2. DAG con BashOperator](#2-dag-con-bashoperator)
+    - [3. DAG con dependencias entre tareas](#3-dag-con-dependencias-entre-tareas)
+    - [4. DAG con Branching (ramificación condicional)](#4-dag-con-branching-ramificación-condicional)
 - [🚀 Cómo Usar los DAGs](#-cómo-usar-los-dags)
 - [🔗 Referencias](#-referencias)
 
@@ -33,89 +36,126 @@ Un **DAG (Directed Acyclic Graph)** en Apache Airflow es una colección de tarea
 ## ⚙️ Estructura de un DAG
 
 ```python
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from datetime import datetime
+# Librerias necesarias
+from airflow import DAG     # Para instanciar un DAG
+from airflow.operators...   # Para importar tipos de operadores
 
-def mi_tarea():
-    print('¡Hola, Airflow!')
+def tarea_fun():
+    # Funcion con la tarea
+    # TODO: La tarea aqui
 
-with DAG('mi_primer_dag',
-         start_date=datetime(2025, 1, 1),
-         schedule_interval='@daily',
-         catchup=False) as dag:
+with DAG('nombre_del_dag',                  # Nombre del DAG
+         start_date=datetime(2025, 1, 1),   # Fecha de inicio
+         schedule_interval='@daily',        # Frecuencia de ejecución
+         catchup=False
+        ) as dag:
+    # Definir el operador con la tarea a ejecutar
     tarea = PythonOperator(
-        task_id='saludo',
-        python_callable=mi_tarea
+        task_id='saludo',            # Nombre de la tarea
+        python_callable=tarea_fun    # Funcion a ejecutar
     )
 ```
 
-- **DAG:** Define el flujo de trabajo y su programación.
-- **PythonOperator:** Ejecuta una función de Python como tarea.
-- **Dependencias:** Se pueden definir usando `tarea1 >> tarea2` o `tarea1.set_downstream(tarea2)`.
-
-
-
 ## 🛠️ DAGs Incluidos
 
-### 1. **DAG Hola Mundo** (`dag_hello_world.py`)
+### 1. DAG Hello World
 
-- **Propósito:** Muestra un simple saludo en la consola.
-- **Operador Utilizado:** `PythonOperator`
-- **Código Principal:**
-```python
-print('¡Hola, Airflow!')
-```
+**Archivo:** `dag_hello_world.py`
 
-### 2. **DAG con BashOperator** (`dag_bash_operator.py`)
+Este es el ejemplo más básico: un DAG con una sola tarea que imprime un mensaje en los logs usando `PythonOperator`.
 
-- **Propósito:** Ejecuta un comando Bash dentro del contenedor.
-- **Operador Utilizado:** `BashOperator`
-- **Código Principal:**
-```bash
-echo 'Este es un comando Bash ejecutado desde Airflow'
-```
+#### Tarea
+- Imprime: `¡Hola, Airflow!`
 
-### 3. **DAG con Dependencias** (`dag_dependencies.py`)
+#### Operadores usados
+- `PythonOperator`
 
-- **Propósito:** Muestra cómo establecer dependencias entre tareas.
-- **Tareas:**
-  - `inicio`: Imprime un mensaje de inicio.
-  - `proceso`: Simula un proceso intermedio.
-  - `fin`: Indica la finalización del flujo de trabajo.
-- **Dependencias:** `inicio >> proceso >> fin`
+#### Vista esperada
+![Captura Hello World](../screenshots/hello_world.png)
+
+
+### 2. DAG con BashOperator
+
+**Archivo:** `dag_bash_operator.py`
+
+Este DAG ejecuta un comando Bash simple que imprime un mensaje.
+
+#### Tarea
+- Ejecuta: `echo 'Este es un comando Bash ejecutado desde Airflow'`
+
+#### Operadores usados
+- `BashOperator`
+
+#### Vista esperada
+![Captura BashOperator](../screenshots/bash_operator.png)
+
+
+### 3. DAG con dependencias entre tareas
+
+**Archivo:** `dag_dependencies.py`
+
+Este DAG contiene tres tareas conectadas en secuencia (`inicio >> proceso >> fin`). Cada una imprime un mensaje diferente.
+
+#### Flujo de ejecución
+1. `inicio`: imprime "Inicio del proceso"
+2. `proceso`: imprime "Procesando datos..."
+3. `fin`: imprime "Proceso finalizado"
+
+#### Operadores usados
+- `PythonOperator`
+
+#### Vista esperada
+![Captura Dependencias](../screenshots/dependencies.png)
+
+
+### 4. DAG con Branching (ramificación condicional)
+
+**Archivo:** `dag_branching.py`
+
+Este DAG demuestra cómo usar `BranchPythonOperator` para ejecutar una u otra tarea según una condición (en este caso, un número aleatorio entre 1 y 10).
+
+#### Lógica del DAG
+- Se genera un número aleatorio.
+- Si es mayor a 5, se ejecuta `tarea_mayor_5`.
+- Si es menor o igual, se ejecuta `tarea_menor_5`.
+- Ambas tareas convergen en `fin`.
+
+#### Operadores usados
+- `BranchPythonOperator`
+- `EmptyOperator` (sustituto moderno de `DummyOperator`)
+
+#### Vista esperada
+![Captura Branching](../screenshots/branching.png)
 
 
 
 ## 🚀 Cómo Usar los DAGs
 
-1. Copia los archivos `.py` de los DAGs en la carpeta `dags` de tu entorno de `airflow-quickstart`.
 
-```bash
-cp dags/*.py /ruta/a/airflow-quickstart/dags
-```
-
-
-2. Reinicia el servidor de Airflow para cargar los nuevos DAGs.
+1. Reinicia el servidor de Airflow para cargar los nuevos DAGs.
 
 ```bash
 docker compose restart airflow-webserver
 ```
 
 
-3. Accede a la interfaz web de Airflow en [http://localhost:8080](http://localhost:8080) y verifica que los DAGs aparezcan como activos.
-    	
-    Deberías de poder ver alg como esto en tu interfaz web
-
-    ![alt text](../screenshots/simple-dags.png)
+2. Accede a la interfaz web de Airflow en [http://localhost:8080](http://localhost:8080) y verifica que los DAGs de la siguiente forma:
+    ![Captura DAGs](../screenshots/dags.png)
 
 
-4. Prueba ejecutar un DAG con la interfaz y comprueba su funcionamiento, para lograrlo navega a cualquiera de los DAGs y presiona el botón de run
+3. Prueba ejecutar un DAG por medio de la interfaz y comprueba su funcionamiento, para lograrlo navega a cualquiera de los DAGs y presiona el botón de `trigger dag`:
+    
+    ![Trigger DAG](../screenshots/run_dag.png)
 
-    ![alt text](../screenshots/run-dag.png)
 
-    Luego ve a la ventana de graph, selecciona la tarea que deseas verificar y visita logs, ahi deberias de ver la ejecución del DAG
-    ![alt text](../screenshots/dag-log.png)
+    Luego ve a la ventana de graph, selecciona la tarea que deseas verificar y visita logs, 
+    
+    ![Vista DAG](../screenshots/Graph_view.png)
+
+    En el log deberias de ver la ejecución del DAG, para el ejemplo de `Hello World` el log se ve así:
+    
+    ![Vista Logs](../screenshots/dag_logs.png)
+    
 
 
 ## 🔗 Referencias

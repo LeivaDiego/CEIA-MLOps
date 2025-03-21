@@ -98,16 +98,17 @@ AIRFLOW__CORE__LOAD_EXAMPLES: 'true' # Cambia a 'false' para no cargar ejemplos
    # Inicializar la base de datos y servicios
    docker compose up airflow-init
    ```
-   > [!NOTE]
-   > Solo es necesario ejecutar este comando la primera vez que inicializas el entorno.
+> [!IMPORTANT]
+> Solo es necesario ejecutar el comando anterior la primera vez que inicializas el entorno.
+ 
 
 3. Ejecuta el siguiente comando para ejecutar Apache Airflow :
    ```bash
    # Iniciar todos los servicios en segundo plano
    docker compose up -d
    ```
-   >[!TIP] 
-   > Utilice la bandera `-d` o `--detach` para ejecutar el compose de Apache Airflow en segundo plano y tener una terminal mas limpia.
+ >[!TIP] 
+ > Utilice la bandera `-d` o `--detach` para ejecutar el compose de Apache Airflow en segundo plano y tener una terminal mas limpia.
 
 
 
@@ -156,7 +157,6 @@ Asegúrate de que todos los servicios estén en estado **healthy**. Si dicen `he
    - **Usuario:** airflow
    - **Contraseña:** airflow
 
-
 3. Deberías de ver algo como esto:
 
    ![Airflow GUI](screenshots/airflow-gui.png)
@@ -174,19 +174,17 @@ docker compose down
 - Si quieres empezar desde 0 otra vez, ejecuta el siguiente comando:
    ```bash
    docker compose down --volumes --remove-orphans
-   ```          
-   > [!CAUTION] 
-   > Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
+   ```
+> [!CAUTION] 
+> Esto eliminará todos los volúmenes y datos almacenados, listo para empezar de nuevo.
 
 
 - Si ya no necesitas el entorno y deseas limpiar todos los contenedores y volúmenes asociados, ejecuta el siguiente comando:
-   ```bash
+  ```bash
    docker compose down --volumes --remove-orphans --rmi all
-   ```
-   >[!CAUTION] 
-   > Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
-
-
+  ```
+>[!CAUTION] 
+> Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
 
 ## 💻 Uso de VSCode con Dev Containers
 
@@ -205,8 +203,8 @@ docker compose down
 ### ⚙️ Pasos para Configurar el Dev Container
 
 1. **Crear un Dockerfile:** En el mismo directorio donde está el `docker-compose.yaml`, crea un archivo `Dockerfile` con el siguiente contenido mínimo:
-   > [!NOTE]
-   > Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
+ > [!NOTE]
+ > Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
 
    ```dockerfile
    FROM apache/airflow:<version>
@@ -214,18 +212,16 @@ docker compose down
    ```
 
 1. **Agregar Configuración de Dev Container:**
+ > [!IMPORTANT]
+ > El proceso puede tardar unos minutos en lo que se descargan los elementos necesarios para la conexión remota.
    - Abre VS Code y navega a la paleta de comandos (`Ctrl + Shift + P`).
    - Escribe `Dev Containers: Add Development Container Configuration Files`.
    - Selecciona `Add configuration to workspace` para crear en el directorio de trabajo la carpeta de configuraciones
    - Selecciona `From Dockerfile` y elige elementos adicionales si lo deseas o solo da en `ok`.
   
-
 2. **Reabrir en el Contenedor:**
    - Nuevamente, usa `Ctrl + Shift + P`, escribe `Dev Containers: Reopen in Container` y selecciónalo.
    - VS Code construirá el contenedor y se abrirá en una nueva ventana.
-   > [!IMPORTANT]
-   > El proceso puede tardar unos minutos en lo que se descargan los elementos necesarios para la conexión remota.
-
 
 3. **Instalar la Extensión de Python:**
    - Abre el panel de extensiones en VS Code, busca `Python` y selecciona `Install in Dev Container` para habilitar el Intellisense.
@@ -234,11 +230,9 @@ docker compose down
    - Haz clic en la barra inferior izquierda (`Select Python Interpreter`) y elige el intérprete del entorno Docker (En este caso python 3.8).
 
 5. **Abrir una Terminal Local:**
+ > [!TIP]
+ > Este paso es opcional si quieres tener acceso a una terminal de tu máquina local y no del contenedor, pero es muy útil para reiniciar el contenedor del webserver para actualizar la vista de los DAGs en la UI de Airflow.
    - Usa `Ctrl + Shift + P` y selecciona `Create New Integrated Terminal (Local)`.
-   > [!TIP]
-   > Este paso es opcional si quieres tener acceso a una terminal de tu máquina local y no del contenedor, pero es muy útil para reiniciar el contenedor del webserver para actualizar la vista de los DAGs en la UI de Airflow.
 
-6. **Cerrar el Dev Container:**
+7. **Cerrar el Dev Container:**
    - Para salir del entorno, usa `Ctrl + Shift + P`, busca `Close Dev Container` y seleccionaló.
-   > [!NOTE]
-   > Si lo deseas, también puedes ignorar los mensajes de advertencia sin que afecte el funcionamiento de Airflow.

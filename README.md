@@ -23,8 +23,10 @@ Este repositorio contiene el progreso y la documentación de mi aprendizaje sobr
 ```
 workspace/
 ├─ quickstart-airflow/        # Carpeta para el entorno rápido con Apache Airflow
-│   ├─ dags/                  # Ejemplos sencillos de DAGs
-│   ├─ docker-compose.yaml    # Archivo de configuración Docker
+│   ├─ dags/                  # Ejemplos de DAGs para aprender las Bases de Airflow
+│   ├─ screenshots/           # Capturas de Pantalla de la interfaz de Airflow
+│   ├─ docker-compose.yaml    # Archivo de configuración de contenedores y volumenes de Docker
+│   ├─ Dockerfile             # Archivo de configuración de imágen de Docker
 │   └─ README.md              # Instrucciones detalladas del quickstart
 |
 ├─ intro-mlops/               # Carpeta con la introducción teórica a MLOps
@@ -59,6 +61,5 @@ cat README.md
 ```
 
 ## 🔍 Próximos Pasos
-
-- Aprender a conectar servicios externos a los DAGs
-- Aplicar manejo de errores y monitoreo
+- Diseñar Arquitectura MLOPs para proyecto
+- Definir Componentes y flujo de trabajo

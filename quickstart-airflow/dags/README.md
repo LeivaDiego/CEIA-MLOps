@@ -15,6 +15,7 @@ Esta carpeta contiene ejemplos simples de **DAGs** (Directed Acyclic Graphs) par
     - [2. DAG con BashOperator](#2-dag-con-bashoperator)
     - [3. DAG con dependencias entre tareas](#3-dag-con-dependencias-entre-tareas)
     - [4. DAG con Branching (ramificación condicional)](#4-dag-con-branching-ramificación-condicional)
+    - [5. DAG con API externa, XComs y monitoreo](#5-dag-con-api-externa-y-uso-de-xcoms)
 - [🚀 Cómo Usar los DAGs](#-cómo-usar-los-dags)
 - [🔗 Referencias](#-referencias)
 
@@ -128,6 +129,77 @@ Este DAG demuestra cómo usar `BranchPythonOperator` para ejecutar una u otra ta
 ![Captura Branching](../screenshots/branching.png)
 
 
+### 5. DAG con API externa y uso de XComs
+
+**Archivo:** `dag_weatherapi.py`
+
+Este DAG muestra cómo integrar Apache Airflow con un servicio externo como `WeatherAPI`, manejar errores, utilizar `XComs` para pasar datos entre tareas y guardar resultados en un archivo JSON.
+
+> [!TIP]
+> Este DAG requiere una imagen personalizada de Airflow que incluya el paquete `requests`. Asegúrate de seguir la sección "Extender imagen base" en el README principal del quickstart para construir la imagen antes de ejecutar este DAG.
+
+#### 🌐 API utilizada
+
+Se utiliza la API de [WeatherAPI.com](https://www.weatherapi.com/) para consultar el clima actual de una ciudad.
+
+#### 🔑 Obtener y configurar la API Key
+
+1. Regístrate en [WeatherAPI.com](https://www.weatherapi.com/signup.aspx) para obtener una cuenta gratuita.
+2. Copia tu API Key desde el dashboard.
+3. Ingresa a la interfaz web de Airflow: [http://localhost:8080](http://localhost:8080)
+4. Ve a **Admin → Variables**:
+    ![Admin Variables](../screenshots/variables-admin.png)
+
+5. Luego agrega una nueva variable:
+    ![Variable WeatherAPI](../screenshots/weatherapi_key.png)
+
+> [!NOTE]
+> Utilizar Variables en Airflow permite mantener seguras las credenciales sensibles sin exponerlas en el código fuente.
+
+
+#### Flujo del DAG
+
+1. **`fetch_weather_data`**:  
+   Consulta la API y extrae los siguientes campos:
+   - Fecha y hora local
+   - Ciudad
+   - Condición del clima
+   - Temperatura (°C)
+   - Velocidad del viento (km/h)
+   - Humedad (%)
+
+   Los resultados se almacenan en `XCom`.
+   ![XCOM Weather](../screenshots/xcom.png)
+
+2. **`export_weather_data`**:  
+   Toma los datos desde `XCom` y los guarda en un archivo JSON en la ruta `/opt/airflow/data/weather_result.json`.
+
+
+#### Ejemplo del archivo generado (`weather_result.json`)
+
+```json
+{
+  "datetime": "2025-03-21 16:15",
+  "city": "Guatemala City",
+  "condition": "Partly cloudy",
+  "temperature_c": 22.1,
+  "wind_kph": 15.5,
+  "humidity": 61
+}
+```
+
+
+#### Operadores utilizados
+
+- `PythonOperator`: para ejecutar la lógica de negocio (consulta de API y guardado del archivo).
+- `XCom`: para compartir datos entre tareas de forma segura.
+
+
+#### Vista esperada del DAG
+
+![Captura Weather DAG](../screenshots/weather_dag.png)
+
+
 
 ## 🚀 Cómo Usar los DAGs
 
@@ -148,11 +220,12 @@ docker compose restart airflow-webserver
     ![Trigger DAG](../screenshots/run_dag.png)
 
 
-    Luego ve a la ventana de graph, selecciona la tarea que deseas verificar y visita logs, 
+4. Luego ve a la ventana de graph, selecciona la tarea que deseas verificar y visita logs, 
     
-    ![Vista DAG](../screenshots/Graph_view.png)
+    ![Vista DAG](../screenshots/graph_view.png)
 
-    En el log deberias de ver la ejecución del DAG, para el ejemplo de `Hello World` el log se ve así:
+
+5. En el log deberias de ver la ejecución del DAG, para el ejemplo de `Hello World` el log se ve así:
     
     ![Vista Logs](../screenshots/dag_logs.png)
     

@@ -18,6 +18,11 @@ Este entorno de `quickstart-airflow` está diseñado para facilitar la instalaci
 - [📋 Mensajes de Éxito Esperados](#-mensajes-de-éxito-esperados)
 - [✅ Verificar el Estado de los Servicios](#-verificar-el-estado-de-los-servicios)
 - [🌐 Acceder a la Interfaz Web](#-acceder-a-la-interfaz-web)
+- [🧱 Extender la Imagen de Apache Airflow](#-extender-la-imagen-de-apache-airflow)
+  - [📦 Paso 1: Crear requirements.txt](#-paso-1-crear-requirementstxt)
+  - [🐳 Paso 2: Crear el Dockerfile](#-paso-2-crear-el-dockerfile)
+  - [📄 Paso 3: Modificar docker-compose.yaml](#-paso-3-modificar-docker-composeyaml)
+  - [🧪 Paso 4: Reconstruir la Imagen](#-paso-4-reconstruir-la-imagen)
 - [🛑 Detener el Entorno](#-detener-el-entorno)
 - [🧹 Eliminar Contenedores y Volúmenes](#-eliminar-contenedores-y-volúmenes)
 - [💻 Uso de VSCode con Dev Containers](#-uso-de-vscode-con-dev-containers)
@@ -43,6 +48,7 @@ quickstart-airflow/
 │   ├─ dag_bash_operator.py       # Ejemplo de un DAG con BashOperator
 │   ├─ dag_dependencies.py        # Ejemplo de un DAG con dependencias entre tareas
 │   ├─ dag_branching.py           # Ejemplo de un DAG con ramas
+│   ├─ dag_weatherapi.py          # Ejemplo de un DAG que utiliza un servicio externo
 │   └─ README.md                  # Guía de uso y explicación de los DAGs
 |
 ├─ plugins/               # Plugins personalizados (si son necesarios)
@@ -161,6 +167,72 @@ Asegúrate de que todos los servicios estén en estado **healthy**. Si dicen `he
 
    ![Airflow GUI](screenshots/airflow-gui.png)
 
+
+## 🧱 Extender la Imagen de Apache Airflow
+Por defecto, este entorno usa la imagen oficial de Apache Airflow (apache/airflow:2.10.5). Sin embargo, cuando queremos **agregar paquetes adicionales** (por ejemplo, para consumir APIs externas o procesar archivos), es una mejor práctica extender la imagen base mediante un `Dockerfile` y un archivo `requirements.txt`.
+
+> [!IMPORTANT]
+> Apache recomienda no usar `_PIP_ADDITIONAL_REQUIREMENTS` para el desarrollo local, porque esto provoca que los contenedores tarden más en iniciar y causar conflictos. Lo mejor es crear una imagen personalizada.
+
+### 📦 Paso 1: Crear requirements.txt
+En la raíz del proyecto, crea un archivo llamado requirements.txt con el siguiente contenido:
+
+```bash
+requests
+```
+Puedes agregar cualquier otro paquete de PyPI necesario para tus DAGs. En este caso solo necesitamos el paquete de `requests` ya que usaremos [Weather API](https://www.weatherapi.com/) 
+
+
+### 🐳 Paso 2: Crear el Dockerfile
+También en la capreta `quickstart-airflow` (junto a tu `docker-compose.yaml`), crea un archivo llamado `Dockerfile` con el siguiente contenido:
+
+```dockerfile
+FROM apache/airflow:2.10.5
+
+# Copiamos el archivo con dependencias
+COPY requirements.txt .
+
+# Instalamos Airflow en la misma versión para evitar conflictos, más nuestras dependencias
+RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION}" -r requirements.txt
+```
+
+### 📄 Paso 3: Modificar docker-compose.yaml
+Ubica esta sección en la parte superior del archivo:
+```yaml
+x-airflow-common:
+  &airflow-common
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.5}
+  # build: .
+```
+
+Y comenta la linea con image y descomenta la de build asi:
+```yaml
+x-airflow-common:
+  &airflow-common
+  # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.5}
+  build: .
+```
+> [!TIP]
+> Esto le dice a Docker Compose que construya una imagen personalizada usando el Dockerfile y el requirements.txt que creaste.
+
+### 🧪 Paso 4: Reconstruir la Imagen
+Cada vez que modifiques el Dockerfile o el requirements.txt, debes reconstruir la imagen con:
+```bash
+docker compose build
+```
+
+Y luego iniciar el entorno como siempre:
+```bash
+docker compose up -d
+```
+
+También puedes usar:
+```bash
+docker compose up --build -d
+```
+para forzar la reconstrucción al levantar el entorno.
+
+
 ## 🛑 Detener el Entorno
 
 Para detener la ejecución del entorno utiliza el siguiente comando:
@@ -186,6 +258,7 @@ docker compose down
 >[!CAUTION] 
 > Esto eliminará todos los volúmenes, datos almacenados e imágenes descargadas.
 
+
 ## 💻 Uso de VSCode con Dev Containers
 
 > [!TIP]
@@ -203,8 +276,9 @@ docker compose down
 ### ⚙️ Pasos para Configurar el Dev Container
 
 1. **Crear un Dockerfile:** En el mismo directorio donde está el `docker-compose.yaml`, crea un archivo `Dockerfile` con el siguiente contenido mínimo:
- > [!NOTE]
- > Esto es unicamente para facilitarnos el proceso de creacion de la conexión remota.
+   
+   > [!NOTE]
+   > Esta paso no es necesario si ya has pasado por la seccion [🧱 Extender la Imagen de Apache Airflow](#-extender-la-imagen-de-apache-airflow)
 
    ```dockerfile
    FROM apache/airflow:<version>

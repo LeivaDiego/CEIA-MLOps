@@ -11,11 +11,11 @@ Este documento proporciona una introducción a MLOps (Machine Learning Operation
 - [🤖 ¿Qué es MLOps?](#-qué-es-mlops)
 - [🧐 ¿Por qué es importante MLOps?](#-por-qué-es-importante-mlops)
 - [🎯 Ventajas de MLOps](#-ventajas-de-mlops)
-- [⚖️ MLOps vs DevOps](#%EF%B8%8F-mlops-vs-devops)
+- [⚖️ MLOps vs DevOps](#️-mlops-vs-devops)
 - [📚 Principios Fundamentales de MLOps](#-principios-fundamentales-de-mlops)
-- [💼 Casos de Uso de MLOps](#-casos-de-uso-de-mlops)
+- [💼 Casos de Uso de MLOps](#-casos-de-uso-mlops)
 - [🚧 Desafíos en la Implementación de MLOps](#-desafíos-en-la-implementación-de-mlops)
-- [🏛️ Arquitecturas de MLOps](#%EF%B8%8F-arquitecturas-de-mlops)
+- [🏛️ Arquitecturas de MLOps](#️-arquitecturas-de-mlops)
   - [🔹 Niveles de Madurez de MLOps](#-niveles-de-madurez-de-mlops)
     - [Nivel 0: Flujos de trabajo manuales](#nivel-0-flujos-de-trabajo-manuales)
     - [Nivel 1: Entrenamiento continuo](#nivel-1-entrenamiento-continuo)
@@ -76,6 +76,28 @@ Aunque MLOps y DevOps comparten el objetivo de optimizar procesos, tienen difere
 - **Dependencia de Datos:** MLOps debe gestionar grandes volúmenes de datos para el entrenamiento y la inferencia, lo que agrega desafíos adicionales en la administración de datos.
 - **Regulación y Cumplimiento:** Los modelos de ML pueden estar sujetos a regulaciones específicas, impactando su desarrollo y despliegue.
 - **Automatización Específica:** MLOps adapta las mejores prácticas de DevOps al entorno de machine learning, añadiendo componentes como el monitoreo continuo del rendimiento del modelo y su actualización automatizada.
+
+
+
+## 📚 Principios Fundamentales de MLOps
+
+Los principios fundamentales de MLOps incluyen:
+
+- **Control de Versiones:** Permite el seguimiento de cambios en modelos y datos, asegurando la reproducibilidad y la capacidad de auditoría.
+- **Automatización:** Optimiza el flujo de trabajo desde la ingesta de datos hasta la implementación del modelo, garantizando consistencia y escalabilidad.
+- **Actividades Continuas:** Integra procesos de integración, entrega, entrenamiento y monitoreo continuo para adaptarse rápidamente a cambios en los datos o modelos.
+- **Gobernanza de Modelos:** Asegura la gestión adecuada de los modelos, desde la colaboración hasta la revisión y validación de sesgos y cumplimiento regulatorio.
+- **Principios de Diseño de Software:** Incluye separación de preocupaciones, simplicidad, interfaces bien definidas y adherencia a principios como SOLID.
+
+
+
+## 💼 Casos de Uso MLOPs
+
+1. **Integración y Despliegue Continuo (CI/CD):** Automatiza el desarrollo y despliegue de modelos, permitiendo iteraciones rápidas y consistentes en sectores como la salud y tecnología.
+2. **Escalabilidad y Gestión de Recursos:** Empresas como Walmart usan MLOps para mejorar la eficiencia en previsión de demanda y detección de fraudes.
+3. **Monitoreo y Alertas en Tiempo Real:** Netflix usa MLOps para mantener la calidad de sus recomendaciones mediante la detección temprana de anomalías en sus modelos.
+4. **Gestión de Datos y Gobernanza:** Ocado optimiza la integridad de datos en sus modelos de aprendizaje automático para asegurar experiencias consistentes y de calidad para sus clientes.
+5. **Pruebas Automatizadas y Validación:** En el sector salud, MLOps permite la validación continua de modelos para predicciones de enfermedades y mejora de procesos médicos.
 
 
 

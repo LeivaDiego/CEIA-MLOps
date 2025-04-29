@@ -3,7 +3,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-from scripts.db_utils import create_weather_table, insert_weather_data
+from scripts.db_utils import create_weather_table, insert_history_data
 
 # Argumentos por defecto para las tareas
 default_args = {
@@ -34,7 +34,7 @@ with DAG(
     # Tarea para insertar datos de clima en la tabla
     insert_data_task = PythonOperator(
         task_id='insert_weather_data',
-        python_callable=insert_weather_data
+        python_callable=insert_history_data
     )
 
     # Definición de la secuencia de tareas

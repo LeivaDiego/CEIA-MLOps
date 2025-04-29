@@ -143,12 +143,12 @@ def update_local_csv(new_row):
         if new_row.get("date") in existing_dates:
             raise(f"Registro del: {new_row.get('date')} ya existe en el CSV.")
     
+        # Guardar los datos en el CSV
+        with open(file_path, "a", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=new_row.keys())
+            writer.writerow(new_row)
+        
+        print(f"SUCCESS | Registro guardado el: {new_row.get('date')} en: {file_path}")
+    
     except Exception as e:
         print(f"ERROR | Actualizacion fallida: {e}")
-
-    # Guardar los datos en el CSV
-    with open(file_path, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=new_row.keys())
-        writer.writerow(new_row)
-
-    print(f"SUCCESS | Registro guardado el: {new_row.get('date')} en: {file_path}")

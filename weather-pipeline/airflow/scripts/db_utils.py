@@ -7,6 +7,7 @@ import psycopg2
 import pandas as pd
 # Manejo de archivos y fechas
 from datetime import datetime
+import csv
 import os
 # --- Funciones ---
 
@@ -290,14 +291,17 @@ def log_validation_error(record, reason):
 
     # Verificar si el archivo de logs ya existe
     #   Si existe, se agrega la nueva entrada al archivo
-    if os.path.exists(log_path):
-        df = pd.read_csv(log_path)
-        df = pd.concat([df, pd.DataFrame([entry])], ignore_index=True)
-    else:
-        # Si no existe, se crea un nuevo DataFrame con la entrada
-        df = pd.DataFrame([entry])
+    file_exists = os.path.exists(log_path)
 
-    # Guardar el DataFrame en el archivo CSV
-    #   Se utiliza el modo 'a' para agregar nuevas entradas al final del archivo
-    df.to_csv(log_path, index=False)
+    # Abrir el archivo en modo append (agregar) y escribir la entrada
+    #   Se utiliza DictWriter para escribir el diccionario en el archivo CSV
+    with open(log_path, mode='a', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=["timestamp", "country", "date", "reason"])
+        if not file_exists:
+            # Si el archivo no existe, se escribe la cabecera
+            #   para crear el archivo CSV con los nombres de las columnas
+            writer.writeheader()
+        # Escribir la entrada en el archivo CSV
+        writer.writerow(entry)
+    
     print(f"INFO | Error de ingesta registrado en: {log_path}")

@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import csv
 import os
 
+
 # --- Configuración de la API ---
 # Se obtiene la clave de API de las variables de Airflow
 API_KEY = Variable.get("WEATHER_API_KEY")
@@ -146,6 +147,7 @@ def update_local_csv(new_row):
             writer = csv.DictWriter(f, fieldnames=new_row.keys())
             writer.writerow(new_row)
         
+        # Imprimir mensaje de éxito
         print(f"SUCCESS | Registro guardado el: {new_row.get('date')} en: {file_path}")
     
     except Exception as e:

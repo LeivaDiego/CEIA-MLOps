@@ -5,10 +5,9 @@
 import psycopg2 
 # Manejo de datos
 import pandas as pd
-# Manejo de archivos y fechas
+# Manejo de fechas
 from datetime import datetime
-import csv
-import os
+
 
 # --- Funciones ---
 

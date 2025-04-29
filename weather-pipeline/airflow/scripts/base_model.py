@@ -1,6 +1,7 @@
 # Definición de un modelo base para predicción de lluvia
 
 # --- Librerías ---
+# Scikit-learn para el modelo
 from sklearn.ensemble import RandomForestClassifier
 
 # --- Funciones ---

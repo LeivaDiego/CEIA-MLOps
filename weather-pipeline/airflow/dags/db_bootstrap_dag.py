@@ -14,14 +14,14 @@ default_args = {
 # --- Definición del DAG ---
 # Se define el DAG para inicializar la base de datos con datos de clima
 with DAG(
-    dag_id='database_bootstrap_dag',                            # Nombre del DAG
-    default_args=default_args,                                  # Argumentos por defecto para las tareas
-    description='Bootstrap database with initial weather data', # Descripción del DAG
-    schedule_interval=None,                                     # No hay programación automática
-                                                                #   Se ejecuta una vez al iniciar el DAG
-    start_date=datetime(2025, 5, 1),                            # Fecha de inicio del DAG
-    catchup=False,                                              # No se ejecutan tareas pasadas
-    tags=['bootstrap', 'database'],                             # Etiquetas para el DAG
+    dag_id='database_bootstrap_dag',                # Nombre del DAG
+    default_args=default_args,                      # Argumentos por defecto para las tareas
+    description='Bootstrap de la base de datos',    # Descripción del DAG
+    schedule_interval=None,                         # No hay programación automática
+                                                    #   Se ejecuta una vez al iniciar el DAG
+    start_date=datetime(2025, 5, 1),                # Fecha de inicio del DAG
+    catchup=False,                                  # No se ejecutan tareas pasadas
+    tags=['bootstrap', 'database'],                 # Etiquetas para el DAG
 ) as dag:
 
     # Se definen las tareas del DAG

@@ -2,8 +2,10 @@
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import datetime
 import scripts.model_utils as model_utils
+from scripts.db_utils import log_model_metrics
 
 # Argumentos por defecto para las tareas
 default_args = {
@@ -31,7 +33,7 @@ def load_and_preprocess_task(**context):
     df = model_utils.load_data_from_postgres()
     # Se preprocesa el DataFrame y se separa en conjuntos de entrenamiento y prueba
     #   Se separa el DataFrame en características (X) y etiquetas (y)
-    X_train, X_test, y_train, y_test = model_utils.preprocess_Data(X_train, y_train)
+    X_train, X_test, y_train, y_test = model_utils.preprocess_data(df=df)
 
     # Enviar a XCom los conjuntos de datos
     context['ti'].xcom_push(key="X_train", value=X_train)
@@ -99,8 +101,7 @@ def save_task(**context):
     #   Se utiliza la función save_model para guardar el modelo 
     #   y save_metrics_to_db para guardar las métricas
     model_utils.save_model(model, model_path)
-    model_utils.save_metrics_to_db(metrics, model_version, datetime.today().date())
-
+    log_model_metrics(metrics=metrics, model_path=model_path, model_version=model_version)
 
 # --- Definición del DAG ---
 # Se define el DAG para el entrenamiento y evaluación de un modelo de predicción de lluvia
@@ -144,7 +145,19 @@ with DAG(
         provide_context=True
     )
 
+    # Task para disparar el DAG de monitoreo
+    trigger_monitoring_dag = TriggerDagRunOperator(
+        task_id='trigger_model_monitoring_dag',
+        trigger_dag_id='model_monitoring_dag',
+        wait_for_completion=False,  # True si quieres que espere respuesta
+        reset_dag_run=True,         # Reinicia si ya existe un run previo
+        execution_date="{{ ds }}"   # Pasa la fecha de ejecución
+    )
+
+
     # Definición de la secuencia de tareas
     # Primero se cargan y preprocesan los datos, luego se entrena el modelo,
     #   se evalúa y finalmente se guarda el modelo y las métricas
-    load_and_preprocess >> train >> evaluate >> save
+    #   Después se dispara el DAG de monitoreo
+    load_and_preprocess >> train >> evaluate >> save >> trigger_monitoring_dag
+

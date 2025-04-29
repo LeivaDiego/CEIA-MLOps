@@ -89,12 +89,13 @@ def create_model_metrics_table():
     CREATE TABLE IF NOT EXISTS model_metrics (
         id SERIAL PRIMARY KEY,
         timestamp TIMESTAMP,
+        model_version VARCHAR(100),
+        model_path TEXT,
         accuracy FLOAT,
-        f1_score FLOAT,
         precision FLOAT,
         recall FLOAT,
-        auc FLOAT,
-        model_path TEXT
+        f1_score FLOAT,
+        is_valid BOOLEAN DEFAULT TRUE
     );
     """
 
@@ -382,13 +383,17 @@ def log_validation_error(record, reason):
     print(f"INFO | Error de validación registrado en base de datos: {record.get('date')}")
 
 
-def log_model_metrics(metrics, model_path):
+def log_model_metrics(metrics, model_path, model_version):
     """
     Registra las métricas de un modelo entrenado en la tabla model_metrics de PostgreSQL.
 
     Args:
         metrics (dict): Diccionario con las métricas del modelo (accuracy, f1_score, etc.)
         model_path (str): Ruta donde se guardó el modelo.
+        model_version (str): Versión del modelo.
+
+    Returns:
+        None
     """
     # Obtener la conexión a la base de datos
     conn = get_postgres_connection()
@@ -396,19 +401,23 @@ def log_model_metrics(metrics, model_path):
 
     # Definición de la consulta SQL para insertar las métricas del modelo
     insert_metrics_query = """
-    INSERT INTO model_metrics (timestamp, accuracy, f1_score, precision, recall, auc, model_path)
-    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    INSERT INTO model_metrics (
+        timestamp, model_version, model_path,
+        accuracy, precision, recall, f1_score, is_valid
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
     """
 
     # Ejecutar la consulta de inserción con los valores de las métricas
     cursor.execute(insert_metrics_query, (
         datetime.now(),
+        model_version,
+        model_path,
         metrics.get('accuracy'),
-        metrics.get('f1_score'),
         metrics.get('precision'),
         metrics.get('recall'),
-        metrics.get('auc'),
-        model_path
+        metrics.get('f1_score'),
+        metrics.get('is_valid', True)  # Por defecto, se considera válido
     ))
 
     # Confirmar los cambios en la base de datos

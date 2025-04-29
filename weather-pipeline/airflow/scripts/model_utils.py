@@ -132,7 +132,7 @@ def save_model(model, path):
     print(f"SUCCESS | Modelo guardado en {path}")
 
 
-def load_latest_model(path):
+def load_model(path):
     """
     Carga el modelo más reciente desde disco.
 
@@ -148,60 +148,6 @@ def load_latest_model(path):
     print(f"SUCCESS | Modelo cargado desde {path}")
     # retorna el modelo cargado
     return model
-
-
-def save_metrics_to_db(metrics, model_version, date_trained):
-    """
-    Guarda las métricas de desempeño del modelo en la tabla de métricas en PostgreSQL.
-
-    Args:
-        metrics (dict): Diccionario de métricas.
-        model_version (str): Versión o nombre del modelo.
-        date_trained (str): Fecha de entrenamiento.
-
-    Returns:
-        None
-    """
-    # Conexión a PostgreSQL
-    conn = get_postgres_connection()
-    cursor = conn.cursor()
-
-    # Crea la tabla si no existe
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS model_metrics (
-        id SERIAL PRIMARY KEY,
-        model_version VARCHAR(100),
-        date_trained DATE,
-        accuracy FLOAT,
-        precision FLOAT,
-        recall FLOAT,
-        f1_score FLOAT
-    );
-    """
-    # Ejecuta la consulta para crear la tabla
-    cursor.execute(create_table_query)
-
-    # Inserta las métricas en la tabla
-    insert_query = """
-    INSERT INTO model_metrics (model_version, date_trained, accuracy, precision, recall, f1_score)
-    VALUES (%s, %s, %s, %s, %s, %s);
-    """
-    # Ejecuta la consulta de inserción con las métricas
-    cursor.execute(insert_query, (
-        model_version,
-        date_trained,
-        metrics["accuracy"],
-        metrics["precision"],
-        metrics["recall"],
-        metrics["f1_score"]
-    ))
-
-    # Confirma los cambios y cierra la conexión
-    conn.commit()
-    cursor.close()
-    conn.close()
-    # Imprime un mensaje de éxito
-    print(f"SUCCESS | Métricas guardadas en base de datos para modelo {model_version}")
 
 
 def get_next_model_version(models_dir="/opt/airflow/models/"):
@@ -239,3 +185,81 @@ def get_next_model_version(models_dir="/opt/airflow/models/"):
         return "v1"
     else:
         return f"v{max(version_numbers) + 1}"
+
+
+def mark_model_as_invalid(model_path):
+    """
+    Marca un modelo como inválido en la base de datos PostgreSQL.
+
+    Args:
+        model_path (str): Ruta del modelo a marcar como inválido.
+    """
+    # Conexión a PostgreSQL
+    conn = get_postgres_connection()
+    cursor = conn.cursor()
+
+    # Consulta SQL para marcar el modelo como inválido
+    update_query = """
+    UPDATE model_metrics
+    SET is_valid = FALSE
+    WHERE model_path = %s;
+    """
+
+    # Ejecuta la consulta de actualización
+    cursor.execute(update_query, (model_path,))
+    # Confirma los cambios en la base de datos
+    conn.commit()
+    # Cierra el cursor y la conexión
+    cursor.close()
+    conn.close()
+    # Imprime un mensaje de éxito
+    print(f"INFO | Modelo {model_path} marcado como inválido.")
+
+
+def compare_models():
+    """
+    Compara los 2 modelos válidos más recientes.
+    Si el nuevo modelo tiene peor F1-score, lo marca como inválido.
+    """
+    conn = get_postgres_connection()
+    cursor = conn.cursor()
+
+    # Obtener los 2 modelos válidos más recientes
+    cursor.execute("""
+        SELECT timestamp, f1_score, model_version, model_path
+        FROM model_metrics
+        WHERE is_valid = TRUE
+        ORDER BY timestamp DESC
+        LIMIT 2;
+    """)
+    rows = cursor.fetchall()
+
+    # Si no hay suficientes modelos válidos, se sale de la función
+    if len(rows) < 2:
+        print("INFO | No hay suficientes modelos válidos para comparar.")
+        cursor.close()
+        conn.close()
+        return
+
+    # Desempaqueta los resultados
+    latest_model = rows[0]
+    previous_model = rows[1]
+
+    latest_f1 = latest_model[1]
+    previous_f1 = previous_model[1]
+    model_path = latest_model[3]
+
+    # Imprime información de los modelos
+    print(f"INFO | F1-score actual: {latest_f1}")
+    print(f"INFO | F1-score anterior: {previous_f1}")
+
+    # Compara los F1-scores
+    if latest_f1 < previous_f1:
+        print(f"WARNING: El nuevo modelo en {model_path} tiene un rendimiento inferior. Será marcado como inválido.")
+        mark_model_as_invalid(model_path)
+    else:
+        print(f"SUCCESS: El nuevo modelo en {model_path} tiene igual o mejor rendimiento.")
+
+    # Cierra el cursor y la conexión
+    cursor.close()
+    conn.close()

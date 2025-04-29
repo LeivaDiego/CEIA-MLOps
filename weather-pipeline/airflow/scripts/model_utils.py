@@ -11,6 +11,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # PostgreSQL para conexión y almacenamiento de métricas
 from scripts.db_utils import get_postgres_connection
 from scripts.base_model import get_base_model
+# Manejo de archivos
+import os
 
 # --- Funciones ---
 
@@ -167,3 +169,35 @@ def save_metrics_to_db(metrics, model_version, date_trained):
     cursor.close()
     conn.close()
     print(f"SUCCESS | Métricas guardadas en base de datos para modelo {model_version}")
+
+
+def get_next_model_version(models_dir="/opt/airflow/models/"):
+    """
+    Obtiene el próximo número de versión de modelo basado en los archivos existentes.
+
+    Args:
+        models_dir (str): Directorio donde se almacenan los modelos .pkl
+
+    Returns:
+        str: Nueva versión del modelo, por ejemplo: 'v3'
+    """
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+        return "v1"
+    
+    model_files = [f for f in os.listdir(models_dir) if f.endswith(".pkl")]
+    version_numbers = []
+
+    for f in model_files:
+        name = os.path.splitext(f)[0]  # quita .pkl
+        if name.startswith("model_v"):
+            try:
+                num = int(name.replace("model_v", ""))
+                version_numbers.append(num)
+            except ValueError:
+                continue
+
+    if not version_numbers:
+        return "v1"
+    else:
+        return f"v{max(version_numbers) + 1}"

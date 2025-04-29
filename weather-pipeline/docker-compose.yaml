@@ -32,7 +32,8 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
     # Scripts adicionales compartidos entre otras aplicaciones
     - ${AIRFLOW_PROJ_DIR:-.}/src:/opt/airflow/src
-
+    # Modelos de ML para el pipeline
+    - ${AIRFLOW_PROJ_DIR:-.}/models:/opt/airflow/models
   
   # UID del usuario de Airflow
   user: "${AIRFLOW_UID:-50000}:0"

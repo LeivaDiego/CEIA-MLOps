@@ -3,7 +3,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-from scripts.db_utils import create_weather_table, insert_history_data
+import scripts.db_utils as db_utils  # Importa funciones de utilidades de base de datos
 
 # Argumentos por defecto para las tareas
 default_args = {
@@ -26,17 +26,30 @@ with DAG(
 
     # Se definen las tareas del DAG
     # Tarea para crear la tabla de datos de clima
-    create_table_task = PythonOperator(
+    create_weather_table_task = PythonOperator(
         task_id='create_weather_table',
-        python_callable=create_weather_table
+        python_callable=db_utils.create_weather_table
+    )
+
+    # Tarea para crear la tabla de log de errores en validación
+    create_log_table_task = PythonOperator(
+        task_id='create_log_table',
+        python_callable=db_utils.create_validation_log_table
+    )
+
+    # Tarea para crear la tabla de metricas de modelo
+    create_metrics_table_task = PythonOperator(
+        task_id='create_metrics_table',
+        python_callable=db_utils.create_model_metrics_table
     )
 
     # Tarea para insertar datos de clima en la tabla
     insert_data_task = PythonOperator(
         task_id='insert_weather_data',
-        python_callable=insert_history_data
+        python_callable=db_utils.insert_history_data
+
     )
 
     # Definición de la secuencia de tareas
     # Primero se crea la tabla y luego se insertan los datos
-    create_table_task >> insert_data_task
+    create_weather_table_task >> create_log_table_task >> create_metrics_table_task >> insert_data_task

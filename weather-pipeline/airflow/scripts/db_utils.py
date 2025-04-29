@@ -33,6 +33,86 @@ def get_postgres_connection():
     # Retornar la conexión
     return db_conn
 
+def create_validation_log_table():
+    """
+    Crea la tabla validation_log en la base de datos PostgreSQL si no existe. 
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Definición de la consulta SQL para crear la tabla
+    # Si la tabla ya existe, no se crea de nuevo
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS validation_log (
+        id SERIAL PRIMARY KEY,
+        timestamp TIMESTAMP,
+        country VARCHAR(100),
+        date DATE,
+        reason TEXT
+    );
+    """
+
+    # Obtener la conexión a la base de datos
+    conn = get_postgres_connection()
+    # Crear un cursor para ejecutar la consulta
+    cursor = conn.cursor()
+    # Ejecutar la consulta para crear la tabla
+    cursor.execute(create_table_query)
+    # Confirmar los cambios en la base de datos
+    conn.commit()
+    # Cerrar el cursor y la conexión
+    cursor.close()
+    # Cerrar la conexión a la base de datos
+    conn.close()
+
+    # Mensaje de confirmación
+    print("SUCCESS: Tabla validation_log creada o verificada.")
+
+def create_model_metrics_table():
+    """
+    Crea la tabla model_metrics en la base de datos PostgreSQL si no existe. 
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Definición de la consulta SQL para crear la tabla
+    # Si la tabla ya existe, no se crea de nuevo
+    # Tabla de métricas de modelos
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS model_metrics (
+        id SERIAL PRIMARY KEY,
+        timestamp TIMESTAMP,
+        accuracy FLOAT,
+        f1_score FLOAT,
+        precision FLOAT,
+        recall FLOAT,
+        auc FLOAT,
+        model_path TEXT
+    );
+    """
+
+    # Obtener la conexión a la base de datos
+    conn = get_postgres_connection()
+    # Crear un cursor para ejecutar la consulta
+    cursor = conn.cursor()
+    # Ejecutar la consulta para crear la tabla
+    cursor.execute(create_table_query)
+    # Confirmar los cambios en la base de datos
+    conn.commit()
+    # Cerrar el cursor y la conexión
+    cursor.close()
+    # Cerrar la conexión a la base de datos
+    conn.close()
+
+    # Mensaje de confirmación
+    print("SUCCESS: Tabla model_metrics creada o verificada.")
+
 
 def create_weather_table():
     """
@@ -267,41 +347,76 @@ def insert_history_data(file_path="/opt/airflow/data/weather_data.csv"):
 
 def log_validation_error(record, reason):
     """
-    Registra un error de validación en un archivo CSV para su posterior revisión.
-    El registro incluye la fecha y hora del error, el país y la fecha del registro,
-    y el motivo del error.
+    Registra un error de validación en la tabla validation_errors de PostgreSQL.
 
     Args:
         record (dict): Registro de clima que falló la validación.
         reason (str): Motivo del error de validación.
-
-    Returns:
-        None
     """
-    # Definir la ruta del archivo CSV para registrar los errores de validación
-    log_path = "/opt/airflow/logs/validation_errors.csv"
-    
-    # Crear la carpeta de logs si no existe
-    entry = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "country": record.get('country', 'N/A'),
-        "date": record.get('date', 'N/A'),
-        "reason": reason
-    }
+    # Obtener la conexión a la base de datos
+    conn = get_postgres_connection()
+    cursor = conn.cursor()
 
-    # Verificar si el archivo de logs ya existe
-    #   Si existe, se agrega la nueva entrada al archivo
-    file_exists = os.path.exists(log_path)
+    # Definición de la consulta SQL para insertar el error de validación
+    insert_error_query = """
+    INSERT INTO validation_errors (timestamp, country, date, reason)
+    VALUES (%s, %s, %s, %s);
+    """
 
-    # Abrir el archivo en modo append (agregar) y escribir la entrada
-    #   Se utiliza DictWriter para escribir el diccionario en el archivo CSV
-    with open(log_path, mode='a', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=["timestamp", "country", "date", "reason"])
-        if not file_exists:
-            # Si el archivo no existe, se escribe la cabecera
-            #   para crear el archivo CSV con los nombres de las columnas
-            writer.writeheader()
-        # Escribir la entrada en el archivo CSV
-        writer.writerow(entry)
-    
-    print(f"INFO | Error de ingesta registrado en: {log_path}")
+    # Ejecutar la consulta de inserción con los valores del registro
+    cursor.execute(insert_error_query, (
+        datetime.now(),
+        record.get('country', 'N/A'),
+        record.get('date', None),
+        reason
+    ))
+
+    # Confirmar los cambios en la base de datos
+    conn.commit()
+
+    # Cerrar el cursor y la conexión a la base de datos
+    cursor.close()
+    conn.close()
+
+    # Mensaje de confirmación
+    print(f"INFO | Error de validación registrado en base de datos: {record.get('date')}")
+
+
+def log_model_metrics(metrics, model_path):
+    """
+    Registra las métricas de un modelo entrenado en la tabla model_metrics de PostgreSQL.
+
+    Args:
+        metrics (dict): Diccionario con las métricas del modelo (accuracy, f1_score, etc.)
+        model_path (str): Ruta donde se guardó el modelo.
+    """
+    # Obtener la conexión a la base de datos
+    conn = get_postgres_connection()
+    cursor = conn.cursor()
+
+    # Definición de la consulta SQL para insertar las métricas del modelo
+    insert_metrics_query = """
+    INSERT INTO model_metrics (timestamp, accuracy, f1_score, precision, recall, auc, model_path)
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    """
+
+    # Ejecutar la consulta de inserción con los valores de las métricas
+    cursor.execute(insert_metrics_query, (
+        datetime.now(),
+        metrics.get('accuracy'),
+        metrics.get('f1_score'),
+        metrics.get('precision'),
+        metrics.get('recall'),
+        metrics.get('auc'),
+        model_path
+    ))
+
+    # Confirmar los cambios en la base de datos
+    conn.commit()
+
+    # Cerrar el cursor y la conexión a la base de datos
+    cursor.close()
+    conn.close()
+
+    # Mensaje de confirmación
+    print(f"INFO | Métricas del modelo registradas exitosamente para modelo: {model_path}")

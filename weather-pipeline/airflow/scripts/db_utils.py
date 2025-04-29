@@ -9,8 +9,8 @@ import pandas as pd
 from datetime import datetime
 import csv
 import os
-# --- Funciones ---
 
+# --- Funciones ---
 
 def get_postgres_connection():
     """
@@ -32,6 +32,7 @@ def get_postgres_connection():
     )
     # Retornar la conexión
     return db_conn
+
 
 def create_validation_log_table():
     """
@@ -70,6 +71,7 @@ def create_validation_log_table():
 
     # Mensaje de confirmación
     print("SUCCESS: Tabla validation_log creada o verificada.")
+
 
 def create_model_metrics_table():
     """
@@ -305,7 +307,6 @@ def insert_weather_forecast(record):
     conn.close()
 
     return True # Retornar True si la inserción fue exitosa
-
 
 
 def insert_history_data(file_path="/opt/airflow/data/weather_data.csv"):

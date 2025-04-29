@@ -1,8 +1,6 @@
 # Modulo para obtener datos del clima de la API de WeatherAPI y actualizar el archivo CSV localmente.
-# Este módulo se utiliza en el DAG de Airflow para la ingesta diaria de datos del clima.
 
-# Librerías
-
+# --- Librerías ---
 # Solicitud HTTP
 import requests
 # Manejo de datos

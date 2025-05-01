@@ -15,7 +15,7 @@ import os
 
 # --- Configuración de la API ---
 # Se obtiene la clave de API de las variables de Airflow
-API_KEY = Variable.get("WEATHER_API_KEY")
+API_KEY = Variable.get("WEATHER_API_KEY", default_var=None)
 # Se define la URL base de la API y la ciudad para la que se desea obtener el clima
 BASE_URL = "http://api.weatherapi.com/v1/history.json"
 # Se utiliza la ciudad de Guatemala como ejemplo

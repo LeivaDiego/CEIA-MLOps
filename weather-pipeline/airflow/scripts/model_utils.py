@@ -1,6 +1,13 @@
 # Modulo para preparar el modelo de predicción de lluvia, junto con las métricas de desempeño y su almacenamiento en PostgreSQL.
 
 # --- Librerías ---
+
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
+
 # Manejo de datos
 import pandas as pd
 import pickle
@@ -8,10 +15,8 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # PostgreSQL para conexión y almacenamiento de métricas
-from scripts.db_utils import get_postgres_connection
-from scripts.base_model import get_base_model
-# Manejo de archivos
-import os
+from db_utils import get_postgres_connection
+from base_model import get_base_model
 
 
 # --- Funciones ---

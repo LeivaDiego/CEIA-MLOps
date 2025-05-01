@@ -1,9 +1,15 @@
 # DAG para monitorear el rendimiento de modelos válidos
 
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-import scripts.model_utils as model_utils
+import model_utils as model_utils
 
 # Argumentos por defecto para las tareas
 default_args = {

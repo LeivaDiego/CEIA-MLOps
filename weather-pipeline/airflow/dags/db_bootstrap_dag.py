@@ -1,9 +1,15 @@
 # DAG para inicializar la base de datos con datos de clima.
 
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-import scripts.db_utils as db_utils  # Importa funciones de utilidades de base de datos
+import db_utils as db_utils  # Importa funciones de utilidades de base de datos
 
 # Argumentos por defecto para las tareas
 default_args = {

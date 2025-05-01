@@ -1,0 +1,8 @@
+# Manejo de datos
+pandas
+# Machine learning
+scikit-learn
+# PostgreSQL
+psycopg2-binary
+# API y requests
+requests

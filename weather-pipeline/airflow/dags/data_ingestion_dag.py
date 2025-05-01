@@ -1,10 +1,16 @@
 # DAG para la ingesta diaria de datos de clima desde WeatherAPI
 
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-from scripts.api_utils import fetch_weather_data, update_local_csv
-from scripts.db_utils import insert_weather_forecast, validate_row, log_validation_error
+from api_utils import fetch_weather_data, update_local_csv
+from db_utils import insert_weather_forecast, validate_row, log_validation_error
 import pandas as pd
 
 # Argumentos por defecto para las tareas

@@ -1,11 +1,17 @@
 # DAG para el entrenamiento y evaluación de un modelo de predicción de lluvia
 
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import datetime
-import scripts.model_utils as model_utils
-from scripts.db_utils import log_model_metrics
+import model_utils as model_utils
+from db_utils import log_model_metrics
 
 # Argumentos por defecto para las tareas
 default_args = {

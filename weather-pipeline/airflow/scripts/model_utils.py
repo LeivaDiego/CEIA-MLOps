@@ -60,7 +60,7 @@ def preprocess_data(df, test_size=0.2, random_state=42):
     """
     # Copia el DataFrame y elimina columnas innecesarias 
     df = df.copy()
-    df = df.drop(columns=["id", "country", "condition"], errors="ignore")
+    df = df.drop(columns=["id", "country", "condition", "date"], errors="ignore")
     # Se divide el DataFrame en características (X) y target (y)
     X = df.drop(columns=["will_it_rain"])
     y = df["will_it_rain"]

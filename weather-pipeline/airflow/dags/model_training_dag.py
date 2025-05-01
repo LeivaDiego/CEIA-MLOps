@@ -11,7 +11,8 @@ from airflow.operators.python import PythonOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import datetime
 import model_utils as model_utils
-from db_utils import log_model_metrics
+from db_utils import log_model_metrics  
+from pandas import DataFrame, Series
 
 # Argumentos por defecto para las tareas
 default_args = {
@@ -42,15 +43,15 @@ def load_and_preprocess_task(**context):
     X_train, X_test, y_train, y_test = model_utils.preprocess_data(df=df)
 
     # Enviar a XCom los conjuntos de datos
-    context['ti'].xcom_push(key="X_train", value=X_train)
-    context['ti'].xcom_push(key="X_test", value=X_test)
-    context['ti'].xcom_push(key="y_train", value=y_train)
-    context['ti'].xcom_push(key="y_test", value=y_test)
+    context['ti'].xcom_push(key="X_train", value=X_train.to_dict(orient="records"))
+    context['ti'].xcom_push(key="X_test", value=X_test.to_dict(orient="records"))
+    context['ti'].xcom_push(key="y_train", value=y_train.tolist())
+    context['ti'].xcom_push(key="y_test", value=y_test.tolist())
 
 def train_task(**context):
     """
     Entrena el modelo usando los datos de entrenamiento.
-    Guarda el modelo en XCom.
+    Guarda el modelo en disco local.
 
     Args:
         context (dict): Contexto de Airflow que contiene información sobre la tarea y el DAG.
@@ -59,12 +60,23 @@ def train_task(**context):
         None
     """
     # Se obtienen los datos de entrenamiento desde XCom
-    X_train = context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_train")
-    y_train = context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_train")
+    X_train = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_train"))
+    y_train = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_train"))
+    
     # Se entrena el modelo usando los datos de entrenamiento
-    #   Se guarda el modelo en XCom para su posterior uso
     model = model_utils.train_model(X_train, y_train)
-    context['ti'].xcom_push(key="model", value=model)
+    
+    # Se guarda el modelo en disco local y se envía su ruta a XCom
+    #   Se obtiene la version del modelo
+    model_version = model_utils.get_next_model_version(models_dir)
+    #   Se genera la ruta del modelo
+    model_path = f"{models_dir}model_{model_version}.pkl"
+    #   Se guarda el modelo en la ruta generada
+    model_utils.save_model(model, model_path)
+
+    #  Se envía la ruta del modelo y version a XCom para su posterior uso
+    context['ti'].xcom_push(key="model_path", value=model_path)
+    context['ti'].xcom_push(key="model_version", value=model_version)
 
 def evaluate_task(**context):
     """
@@ -77,14 +89,19 @@ def evaluate_task(**context):
     Returns:
         None
     """
-    # Se obtienen el modelo y los datos de prueba desde XCom
-    model = context['ti'].xcom_pull(task_ids="train_model", key="model")
-    X_test = context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_test")
-    y_test = context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_test")
+    # Se obtiene la ruta del modelo y carga el modelo desde disco
+    model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
+    model = model_utils.load_model(model_path)
+
+    # Se cargan los datos de prueba desde XCom
+    X_test = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_test"))
+    y_test = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_test"))
+
     # Se evalúa el modelo usando los datos de prueba
-    #   Se guardan las métricas en XCom para su posterior uso
+    #   Y se envían las métricas a XCom
     metrics = model_utils.evaluate_model(model, X_test, y_test)
     context['ti'].xcom_push(key="metrics", value=metrics)
+
 
 def save_task(**context):
     """
@@ -97,16 +114,13 @@ def save_task(**context):
     Returns:
         None
     """
-    # Se obtienen el modelo y las métricas desde XCom
-    model = context['ti'].xcom_pull(task_ids="train_model", key="model")
+    # Se obtienen las métricas desde XCom
     metrics = context['ti'].xcom_pull(task_ids="evaluate_model", key="metrics")
-    #Se utiliza la función get_next_model_version para obtener la versión del modelo
-    model_version = model_utils.get_next_model_version(models_dir)
-    model_path = f"{models_dir}model_{model_version}.pkl"
+    # Se obtiene la ruta del modelo y la versión desde XCom
+    model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
+    model_version = context['ti'].xcom_pull(task_ids="train_model", key="model_version")
+
     # Se guarda el modelo y las métricas en la base de datos
-    #   Se utiliza la función save_model para guardar el modelo 
-    #   y save_metrics_to_db para guardar las métricas
-    model_utils.save_model(model, model_path)
     log_model_metrics(metrics=metrics, model_path=model_path, model_version=model_version)
 
 # --- Definición del DAG ---
@@ -157,7 +171,8 @@ with DAG(
         trigger_dag_id='model_monitoring_dag',
         wait_for_completion=False,  # True si quieres que espere respuesta
         reset_dag_run=True,         # Reinicia si ya existe un run previo
-        execution_date="{{ ds }}"   # Pasa la fecha de ejecución
+        execution_date="{{ ds }}",  # Pasa la fecha de ejecución
+        trigger_rule="all_success"  # Solo dispara si todas las tareas previas son exitosas
     )
 
 
@@ -166,4 +181,3 @@ with DAG(
     #   se evalúa y finalmente se guarda el modelo y las métricas
     #   Después se dispara el DAG de monitoreo
     load_and_preprocess >> train >> evaluate >> save >> trigger_monitoring_dag
-

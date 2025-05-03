@@ -1,6 +1,11 @@
 # Modulo para obtener datos del clima de la API de WeatherAPI y actualizar el archivo CSV localmente.
 
 # --- Librerías ---
+# Manejo de rutas y configuración
+#   de ruta de modulo
+import sys
+import os
+sys.path.append('/opt/airflow/scripts')
 # Solicitud HTTP
 import requests
 # Manejo de datos
@@ -10,7 +15,12 @@ from airflow.models import Variable
 # Manejo de fechas y archivos
 from datetime import datetime, timedelta
 import csv
-import os
+
+
+# --- Configuración del logger ---
+# Se importa el logger desde el módulo de utilidades de logging
+from log_utils import get_logger
+logger = get_logger(__name__)
 
 
 # --- Configuración de la API ---
@@ -51,6 +61,8 @@ def fetch_weather_data():
         "dt": yesterday
     }
 
+    logger.info(f"Iniciando solicitud a WeatherAPI para {CITY}, fecha: {yesterday}")
+
     # Se realiza la solicitud a la API y se maneja cualquier error de conexión
     try:
         # Se realiza la solicitud GET a la API de WeatherAPI con los parámetros definidos
@@ -64,11 +76,19 @@ def fetch_weather_data():
 
     # Se maneja cualquier error de conexión o respuesta no exitosa 
     except requests.exceptions.RequestException as e:
-        print(f"ERROR | No se pudo obtener datos de la API de WeatherAPI: {e}")
+        logger.error(f"Error de conexión con WeatherAPI ({CITY}, {yesterday}): {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error inesperado al obtener datos del clima: {e}")
         return None
     
     # Se extrae la información relevante del clima de la respuesta JSON
     weather_info = extract_weather_info(data)
+    if weather_info:
+        logger.info(f"Datos de clima obtenidos exitosamente: {CITY}, fecha {weather_info.get('date')}")
+    else:
+        logger.warning(f"No se pudo extraer información válida del clima para {CITY}, fecha: {yesterday}")
+        return None
     
     # Retorna un diccionario con la información del clima
     return weather_info
@@ -87,10 +107,16 @@ def extract_weather_info(data):
     Raises:
         Exception: Si hay un error al extraer los datos
     """
+    logger.info("Extrayendo datos del clima de la respuesta de la API.")
+
     try:
         location_data = data["location"]                            # Información de la ubicación
         weather_data = data["forecast"]["forecastday"][0]["day"]    # Información del clima
         report_date = data["forecast"]["forecastday"][0]["date"]    # Fecha del reporte
+
+        logger.info(
+            f"Extracción exitosa: {location_data['name']}, {location_data['country']} - Fecha: {report_date}"
+        )
 
         return {
             "country": location_data["country"],                        # País
@@ -107,9 +133,10 @@ def extract_weather_info(data):
             "uv": weather_data["uv"]
         }
     
+    
     except Exception as e:
         # Si hay un error al extraer los datos, se lanza una excepción
-        print(f"ERROR | Mala extracción de datos: {e}")
+        logger.error(f"Fallo al extraer datos del JSON de la API: {e}")
         return None
     
 
@@ -123,12 +150,18 @@ def update_local_csv(new_row):
 
     Returns:
         None
-
-    Raises:
-        Exception: Si hay un error al actualizar el archivo CSV o si la fecha ya existe en el CSV
     """
-    # Se define la ruta del archivo CSV local
+    # Se define la ruta del archivo CSV local donde se almacenarán los datos del clima
     file_path = "/opt/airflow/data/weather_data.csv"
+    
+    if new_row is None:
+        logger.error("No se proporcionaron datos para actualizar el CSV.")
+        return
+    
+    date = new_row.get("date", "sin_fecha")
+
+    logger.info(f"Iniciando actualización de CSV local con registro para fecha: {date}")
+
     try:
         # Leer fechas existentes en el CSV
         existing_dates = set()
@@ -137,18 +170,20 @@ def update_local_csv(new_row):
                 reader = csv.DictReader(f)
                 for row in reader:
                     existing_dates.add(row["date"])
-        
-        # Verificar si la fecha ya existe en el CSV
-        if new_row.get("date") in existing_dates:
-            raise(f"Registro del: {new_row.get('date')} ya existe en el CSV.")
-    
-        # Guardar los datos en el CSV
+
+        # Verificar si ya existe
+        if date in existing_dates:
+            raise ValueError(f"Registro del {date} ya existe en el CSV.")
+
+        # Escribir nueva fila
         with open(file_path, "a", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=new_row.keys())
             writer.writerow(new_row)
+
+        logger.info(f"Nuevo registro de clima agregado correctamente: {date}")
+
+    except ValueError as e:
+        logger.warning(f"Registro duplicado detectado, no se insertó: {date}")
         
-        # Imprimir mensaje de éxito
-        print(f"SUCCESS | Registro guardado el: {new_row.get('date')} en: {file_path}")
-    
     except Exception as e:
-        print(f"ERROR | Actualizacion fallida: {e}")
+        logger.error(f"Error al guardar el registro en el CSV ({date}): {e}")

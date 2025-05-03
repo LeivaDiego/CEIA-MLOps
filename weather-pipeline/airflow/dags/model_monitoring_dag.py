@@ -11,6 +11,11 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import model_utils as model_utils
 
+# --- Configuración del logger ---
+# Se importa el logger desde el módulo de utilidades de logging
+from log_utils import get_logger
+logger = get_logger(__name__)
+
 # Argumentos por defecto para las tareas
 default_args = {
     'owner': 'airflow',

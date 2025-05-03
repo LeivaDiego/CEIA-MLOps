@@ -13,6 +13,13 @@ from api_utils import fetch_weather_data, update_local_csv
 from db_utils import insert_weather_forecast, validate_row, log_validation_error
 import pandas as pd
 
+
+# --- Configuración del logger ---
+# Se importa el logger desde el módulo de utilidades de logging
+from log_utils import get_logger
+logger = get_logger(__name__)
+
+
 # Argumentos por defecto para las tareas
 default_args = {
     'owner': 'airflow',
@@ -36,7 +43,12 @@ def fetch_task(**context):
     #   Se obtiene la información del clima y se almacena en XCom
     #   para su posterior uso en otras tareas
     weather_info = fetch_weather_data()
-    context['ti'].xcom_push(key='weather_data', value=weather_info)
+
+    if weather_info:
+        context['ti'].xcom_push(key='weather_data', value=weather_info)
+        logger.info("Datos del clima almacenados en XCom.")
+    else:
+        logger.warning("XCom no se actualizará.")
 
 
 def validate_and_clean_task(**context):
@@ -50,22 +62,28 @@ def validate_and_clean_task(**context):
     Returns:
         None
     """
-    # Se obtiene la información del clima desde XCom
-    #   Se crea un DataFrame a partir de la información obtenida 
-    record = context['ti'].xcom_pull(task_ids='fetch_weather_data', key='weather_data')
-    df = pd.DataFrame([record])
-    row = df.iloc[0]
+    try:
+        # Se obtiene la información del clima desde XCom
+        record = context['ti'].xcom_pull(task_ids='fetch_weather_data', key='weather_data')
 
-    # Se valida la información del clima
-    is_valid, reason = validate_row(row)
-    if is_valid:
-        # Si la información es válida, se almacena en XCom para su posterior uso
-        context['ti'].xcom_push(key='validated_weather_data', value=record)
-    else:
-        # Si la información no es válida, se registra el error y se lanza una excepción
-        #   Se registra el error de validación en la base de datos
-        log_validation_error(record, reason)
-        raise ValueError("ERROR | Validación fallida: datos incorrectos, no se procede a insertar.")
+        # Se crea un DataFrame a partir de la información obtenida 
+        df = pd.DataFrame([record])
+        row = df.iloc[0]
+
+        # Se valida la información del clima
+        reason = validate_row(row)
+        if reason is None:
+            # Si la información es válida, se almacena en XCom para su posterior uso
+            context['ti'].xcom_push(key='validated_weather_data', value=record)
+            logger.info("Datos del clima validados y almacenados en XCom.")
+        else:
+            # Si la información no es válida, se registra el error
+            #   Se registra el error de validación en la base de datos
+            log_validation_error(record, reason)
+            
+    except Exception as e:
+        logger.error(f"Error inesperado durante la validación de datos: {e}")
+        raise
 
 
 def insert_into_postgres(**context):
@@ -79,11 +97,17 @@ def insert_into_postgres(**context):
     Returns:
         None
     """
-    # Se obtiene la información validada desde XCom
-    data = context['ti'].xcom_pull(task_ids='validate_and_clean_data', key='validated_weather_data')
-    # Se inserta la información en la base de datos PostgreSQL
-    #   Se utiliza la función insert_weather_forecast para insertar los datos
-    insert_weather_forecast(data)
+    try:
+        # Se obtiene la información validada desde XCom
+        data = context['ti'].xcom_pull(task_ids='validate_and_clean_data', key='validated_weather_data')
+
+        # Se inserta la información en la base de datos PostgreSQL
+        #   Se utiliza la función insert_weather_forecast para insertar los datos
+        insert_weather_forecast(data)
+        
+    except Exception as e:
+        logger.error(f"Error inesperado durante la inserción en PostgreSQL: {e}")
+        raise
 
 
 def update_csv_task(**context):
@@ -97,11 +121,17 @@ def update_csv_task(**context):
     Returns:
         None
     """
-    # Se obtiene la información validada desde XCom
-    data = context['ti'].xcom_pull(task_ids='validate_and_clean_data', key='validated_weather_data')
-    # Se actualiza el archivo CSV local con la información validada
-    #   Se utiliza la función update_local_csv para actualizar el archivo CSV
-    update_local_csv(data)
+    try:
+        # Se obtiene la información validada desde XCom
+        data = context['ti'].xcom_pull(task_ids='validate_and_clean_data', key='validated_weather_data')
+    
+        # Se actualiza el archivo CSV local con la información validada
+        #   Se utiliza la función update_local_csv para actualizar el archivo CSV
+        update_local_csv(data)
+    
+    except Exception as e:
+        logger.error(f"Error inesperado durante la actualización del archivo CSV: {e}")
+        raise
 
 
 # --- Definición del DAG ---

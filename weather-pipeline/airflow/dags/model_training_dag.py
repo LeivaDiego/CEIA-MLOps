@@ -14,6 +14,11 @@ import model_utils as model_utils
 from db_utils import log_model_metrics  
 from pandas import DataFrame, Series
 
+# --- Configuración del logger ---
+# Se importa el logger desde el módulo de utilidades de logging
+from log_utils import get_logger
+logger = get_logger(__name__)
+
 # Argumentos por defecto para las tareas
 default_args = {
     'owner': 'airflow',
@@ -36,17 +41,24 @@ def load_and_preprocess_task(**context):
     Returns:
         None
     """
-    # Se carga el DataFrame desde PostgreSQL y se preprocesa
-    df = model_utils.load_data_from_postgres()
-    # Se preprocesa el DataFrame y se separa en conjuntos de entrenamiento y prueba
-    #   Se separa el DataFrame en características (X) y etiquetas (y)
-    X_train, X_test, y_train, y_test = model_utils.preprocess_data(df=df)
+    try:
+        # Se carga el DataFrame desde PostgreSQL y se preprocesa
+        df = model_utils.load_data_from_postgres()
+        
+        # Se preprocesa el DataFrame y se separa en conjuntos de entrenamiento y prueba
+        #   Se separa el DataFrame en características (X) y etiquetas (y)
+        X_train, X_test, y_train, y_test = model_utils.preprocess_data(df=df)
 
-    # Enviar a XCom los conjuntos de datos
-    context['ti'].xcom_push(key="X_train", value=X_train.to_dict(orient="records"))
-    context['ti'].xcom_push(key="X_test", value=X_test.to_dict(orient="records"))
-    context['ti'].xcom_push(key="y_train", value=y_train.tolist())
-    context['ti'].xcom_push(key="y_test", value=y_test.tolist())
+        # Enviar a XCom los conjuntos de datos
+        context['ti'].xcom_push(key="X_train", value=X_train.to_dict(orient="records"))
+        context['ti'].xcom_push(key="X_test", value=X_test.to_dict(orient="records"))
+        context['ti'].xcom_push(key="y_train", value=y_train.tolist())
+        context['ti'].xcom_push(key="y_test", value=y_test.tolist())
+        logger.info("Datos cargados y preprocesados correctamente al XCom.")
+
+    except Exception as e:
+        logger.error(f"Error en la carga y preprocesamiento de datos: {e}")
+        raise
 
 def train_task(**context):
     """
@@ -59,24 +71,29 @@ def train_task(**context):
     Returns:
         None
     """
-    # Se obtienen los datos de entrenamiento desde XCom
-    X_train = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_train"))
-    y_train = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_train"))
-    
-    # Se entrena el modelo usando los datos de entrenamiento
-    model = model_utils.train_model(X_train, y_train)
-    
-    # Se guarda el modelo en disco local y se envía su ruta a XCom
-    #   Se obtiene la version del modelo
-    model_version = model_utils.get_next_model_version(models_dir)
-    #   Se genera la ruta del modelo
-    model_path = f"{models_dir}model_{model_version}.pkl"
-    #   Se guarda el modelo en la ruta generada
-    model_utils.save_model(model, model_path)
+    try:
+        # Se obtienen los datos de entrenamiento desde XCom
+        X_train = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_train"))
+        y_train = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_train"))
+        
+        # Se entrena el modelo usando los datos de entrenamiento
+        model = model_utils.train_model(X_train, y_train)
+        
+        # Se guarda el modelo en disco local y se envía su ruta a XCom
+        #   Se obtiene la version del modelo
+        model_version = model_utils.get_next_model_version(models_dir)
+        #   Se genera la ruta del modelo
+        model_path = f"{models_dir}model_{model_version}.pkl"
+        #   Se guarda el modelo en la ruta generada
+        model_utils.save_model(model, model_path)
 
-    #  Se envía la ruta del modelo y version a XCom para su posterior uso
-    context['ti'].xcom_push(key="model_path", value=model_path)
-    context['ti'].xcom_push(key="model_version", value=model_version)
+        #  Se envía la ruta del modelo y version a XCom para su posterior uso
+        context['ti'].xcom_push(key="model_path", value=model_path)
+        context['ti'].xcom_push(key="model_version", value=model_version)
+
+    except Exception as e:
+        logger.error(f"Error en el entrenamiento del modelo: {e}")
+        raise
 
 def evaluate_task(**context):
     """
@@ -89,19 +106,23 @@ def evaluate_task(**context):
     Returns:
         None
     """
-    # Se obtiene la ruta del modelo y carga el modelo desde disco
-    model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
-    model = model_utils.load_model(model_path)
+    try:
+        # Se obtiene la ruta del modelo y carga el modelo desde disco
+        model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
+        model = model_utils.load_model(model_path)
 
-    # Se cargan los datos de prueba desde XCom
-    X_test = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_test"))
-    y_test = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_test"))
+        # Se cargan los datos de prueba desde XCom
+        X_test = DataFrame(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="X_test"))
+        y_test = Series(context['ti'].xcom_pull(task_ids="load_and_preprocess_data", key="y_test"))
 
-    # Se evalúa el modelo usando los datos de prueba
-    #   Y se envían las métricas a XCom
-    metrics = model_utils.evaluate_model(model, X_test, y_test)
-    context['ti'].xcom_push(key="metrics", value=metrics)
-
+        # Se evalúa el modelo usando los datos de prueba
+        #   Y se envían las métricas a XCom
+        metrics = model_utils.evaluate_model(model, X_test, y_test)
+        context['ti'].xcom_push(key="metrics", value=metrics)
+    
+    except Exception as e:
+        logger.error(f"Error en la evaluación del modelo: {e}")
+        raise
 
 def save_task(**context):
     """
@@ -114,15 +135,20 @@ def save_task(**context):
     Returns:
         None
     """
-    # Se obtienen las métricas desde XCom
-    metrics = context['ti'].xcom_pull(task_ids="evaluate_model", key="metrics")
-    # Se obtiene la ruta del modelo y la versión desde XCom
-    model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
-    model_version = context['ti'].xcom_pull(task_ids="train_model", key="model_version")
+    try:
+        # Se obtienen las métricas desde XCom
+        metrics = context['ti'].xcom_pull(task_ids="evaluate_model", key="metrics")
+        # Se obtiene la ruta del modelo y la versión desde XCom
+        model_path = context['ti'].xcom_pull(task_ids="train_model", key="model_path")
+        model_version = context['ti'].xcom_pull(task_ids="train_model", key="model_version")
 
-    # Se guarda el modelo y las métricas en la base de datos
-    log_model_metrics(metrics=metrics, model_path=model_path, model_version=model_version)
-
+        # Se guarda el modelo y las métricas en la base de datos
+        log_model_metrics(metrics=metrics, model_path=model_path, model_version=model_version)
+    
+    except Exception as e:
+        logger.error(f"Error al guardar el modelo y las métricas: {e}")
+        raise
+    
 # --- Definición del DAG ---
 # Se define el DAG para el entrenamiento y evaluación de un modelo de predicción de lluvia
 with DAG(

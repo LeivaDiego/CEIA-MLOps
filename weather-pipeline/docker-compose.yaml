@@ -11,7 +11,7 @@ x-airflow-common:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
@@ -20,9 +20,9 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
 
   # Volumenes de Airflow
-    # Se montan los volúmenes de los DAGs y logs en el contenedor
-    # Adicionalmente se monta el directorio de datos crudos, scripts y src
-    # para que puedan ser utilizados por los DAGs
+  #   Se montan los volúmenes de los DAGs y logs en el contenedor
+  #   Adicionalmente se monta el directorio de datos crudos, scripts y src
+  #   para que puedan ser utilizados por los DAGs
   volumes:
     # DAGs y logs de Airflow
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
@@ -48,7 +48,10 @@ x-airflow-common:
 # Definicion de los servicios
 services:
 
+  # --- Servicios de base de datos ---
+
   # Base de datos PostgreSQL
+  #   Se utiliza como backend para Airflow y para almacenar los datos de los DAGs
   postgres:
     image: postgres:13
     environment:
@@ -62,10 +65,36 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 10s
     restart: always
-  
+
+  # Servicio de pgAdmin (opcional)
+  #   Se utiliza pgAdmin para administrar la base de datos PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com              # Correo de pgAdmin
+      PGADMIN_DEFAULT_PASSWORD: admin                     # Contraseña de pgAdmin
+      PGADMIN_CONFIG_SERVER_MODE: "False"                 # Modo de servidor, desactivado
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"    # Contraseña maestra, desactivada
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - "5050:80" # Puerto de pgAdmin -> localhost:5050
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   # --- Servicios de Airflow ---
 
   # Servidor web de Airflow para la interfaz de usuario
@@ -103,7 +132,7 @@ services:
         condition: service_completed_successfully
   
   # Inicializador de Airflow para crear la base de datos y los usuarios
-    # Este servicio se ejecuta una sola vez al iniciar el contenedor
+  #   Este servicio se ejecuta una sola vez al iniciar el contenedor
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
@@ -180,9 +209,9 @@ services:
       - ${AIRFLOW_PROJ_DIR:-.}/airflow/variables.json:/opt/airflow/variables.json
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
 
-  # Comando de Airflow para ejecutar tareas
-    # Este servicio se utiliza para ejecutar tareas de Airflow desde la línea de comandos
-    # Se puede utilizar para ejecutar tareas de prueba o depuración
+  # Herramienta de línea de comandos de Airflow (opcional)
+  #   Este servicio se utiliza para ejecutar comandos de administración, 
+  #   debug y testing de Airflow manualmente desde una terminal
   airflow-cli:
     <<: *airflow-common
     profiles:
@@ -196,7 +225,8 @@ services:
       - airflow
 
 # Volumenes de datos
-  # Se utilizan para almacenar los datos de la base de datos PostgreSQL
-  # y los DAGs de Airflow
+#   Se utilizan para almacenar los datos de la base de datos PostgreSQL y pgAdmin
+#   y se montan en el contenedor
 volumes:
   postgres-db-volume:
+  pgadmin-data:

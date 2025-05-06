@@ -13,8 +13,8 @@ API_KEY = os.getenv("WEATHER_API_KEY")
 CITY = "Guatemala"
 START_DATE = datetime(2024, 3, 30)      # Fecha de inicio
 END_DATE = datetime(2025, 3, 31)        # Fecha de fin
-DATA_DIR = "../data/raw"          # Directorio de datos
-CSV_FILE = os.path.join(DATA_DIR, "weather_data.csv")
+DATA_DIR = "../airflow/data"            # Directorio de datos
+CSV_FILE = os.path.join(DATA_DIR, "weather_data.csv")   # Archivo CSV de salida
 RETRIES = 3
 RETRY_DELAY = 5  # segundos
 

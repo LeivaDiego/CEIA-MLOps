@@ -30,11 +30,9 @@ x-airflow-common:
     # Scripts utiles solo para los DAGs
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/scripts:/opt/airflow/scripts 
     # Datos crudos
-    - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
-    # Scripts adicionales compartidos entre otras aplicaciones
-    - ${AIRFLOW_PROJ_DIR:-.}/src:/opt/airflow/src
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/data:/opt/airflow/data
     # Modelos de ML para el pipeline
-    - ${AIRFLOW_PROJ_DIR:-.}/models:/opt/airflow/models
+    - ${AIRFLOW_PROJ_DIR:-.}/shared/models:/opt/airflow/models
   
   # UID del usuario de Airflow
   user: "${AIRFLOW_UID:-50000}:0"
@@ -81,7 +79,7 @@ services:
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"    # Contraseña maestra, desactivada
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-      - ./pgadmin/servers.json:/pgadmin4/servers.json
+      - ./airflow/pgadmin/servers.json:/pgadmin4/servers.json
     ports:
       - "5050:80" # Puerto de pgAdmin -> localhost:5050
     healthcheck:

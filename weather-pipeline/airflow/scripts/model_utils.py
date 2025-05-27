@@ -94,6 +94,8 @@ def preprocess_data(df, test_size=0.2, random_state=42):
         
         # Se divide el DataFrame en características (X) y target (y)
         X = df.drop(columns=["will_it_rain"])
+        # Solo las columnas relevantes para el modelo
+        X = df[["avg_temp_c", "humidity", "wind_kph"]]
         y = df["will_it_rain"]
 
         # Se hace un split de los datos en conjuntos de entrenamiento y prueba

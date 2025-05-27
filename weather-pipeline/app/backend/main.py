@@ -4,11 +4,17 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import psycopg2
 import joblib
+import pandas as pd
+import logging
 import os
 
 # --- Configuración ---
 # Inicializa la aplicación FastAPI
 app = FastAPI()
+
+# --- Configuración del logger ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Servir archivos estáticos
 # 
@@ -40,6 +46,7 @@ def predict(temp: float, humidity: int, wind: float):
             password=os.environ["DB_PASS"]
         )
         cur = conn.cursor()
+        logger.info("Conexión a la base de datos PostgreSQL exitosa.")
 
         # Obtener el path del modelo válido más reciente
         cur.execute("""
@@ -50,32 +57,51 @@ def predict(temp: float, humidity: int, wind: float):
             LIMIT 1;
         """)
         row = cur.fetchone()
-
+        # Cerrar el cursor y la conexión
         cur.close()
         conn.close()
 
-        # Si no hay modelos válidos, lanzar excepción
-        # HTTP 404 Not Found
+        # Validar que se haya encontrado un modelo válido
         if not row:
+            logger.error("No se encontraron modelos válidos en la base de datos.")
             raise HTTPException(status_code=404, detail="No hay modelos válidos registrados en la base de datos.")
 
         model_path = row[0]
+        logger.info(f"Modelo válido encontrado: {model_path}")
+
+        # Transformar la ruta de Airflow a la del contenedor actual
+        if model_path.startswith("/opt/airflow/models/"):
+            model_path = model_path.replace("/opt/airflow/models/", "/app/models/")
+
+        logger.info(f"Ruta corregida del modelo en weather-app: {model_path}")
 
         # Validar existencia del archivo .pkl
         if not os.path.exists(model_path):
-            raise HTTPException(status_code=500, detail=f"El archivo del modelo no se encontró en {model_path}")
+            logger.error(f"El archivo del modelo no se encontró en {model_path}")
+            raise HTTPException(status_code=500, detail=f"El archivo del modelo no disponible.")
 
         # Cargar el modelo y predecir
+        logger.info("Cargando el modelo...")
         model = joblib.load(model_path)
-        features = [[temp, humidity, wind]]
-        prediction = model.predict(features)
+        features_df = pd.DataFrame(
+             [[temp, humidity, wind]],
+             columns=["avg_temp_c", "humidity", "wind_kph"]
+            )
+        logger.info(f"Input para predicción:\n{features_df}")
+        prediction = model.predict(features_df)
+
+        logger.info(f"Predicción realizada: {prediction}")
 
         return {
             "will_it_rain": int(prediction[0])
         }
 
+    except HTTPException as he:
+        raise he
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error inesperado en /predict.")
+        raise HTTPException(status_code=500, detail="Error interno al generar la predicción: " + str(e))
 
 
 # Endpoint para datos históricos de temperatura

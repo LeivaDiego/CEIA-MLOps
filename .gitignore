@@ -22,3 +22,6 @@ logs/
 
 # Airflow Variables
 variables.json
+
+# Local Models
+.shared/models/*

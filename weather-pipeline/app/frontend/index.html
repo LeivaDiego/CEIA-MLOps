@@ -33,25 +33,55 @@
 
     <script type="text/babel">
       const { useState, useEffect } = React;
-
+      
       function App() {
         const [temp, setTemp] = useState('');
         const [humidity, setHumidity] = useState('');
         const [wind, setWind] = useState('');
         const [result, setResult] = useState(null);
+        const [errorMsg, setErrorMsg] = useState(null);
         const [chart, setChart] = useState(null);
 
+        // Manejar la predicción
         const handlePredict = async (e) => {
           e.preventDefault();
-          const res = await fetch(`/predict?temp=${temp}&humidity=${humidity}&wind=${wind}`);
-          const data = await res.json();
-          setResult(data.will_it_rain ? "Sí lloverá ☔" : "No lloverá 🌞");
+          try {
+            const res = await fetch(`/predict?temp=${temp}&humidity=${humidity}&wind=${wind}`);
+            let data;
+            try {
+              data = await res.json();
+            } catch (jsonError) {
+              throw new Error("Error al procesar la respuesta del servidor");
+            }
+
+            if (!res.ok) {
+              throw new Error(data.detail || "Error desconocido");
+            }
+
+            setResult(data.will_it_rain ? "Sí lloverá ☔" : "No lloverá 🌞");
+            setErrorMsg(null); // Limpiar errores previos si hay predicción válida
+          } catch (err) {
+            console.error("Error al predecir:", err);
+            setErrorMsg("⚠️ No se pudo generar la predicción");
+            setResult(null);
+          }
         };
 
+        // Cargar el gráfico de temperatura promedio
         useEffect(() => {
           fetch("/metrics/temperature")
-            .then((res) => res.json())
-            .then((data) => {
+            .then(async (res) => {
+              let data;
+              try {
+                data = await res.json();
+              } catch {
+                throw new Error("Respuesta inválida desde /metrics/temperature");
+              }
+
+              if (!res.ok) {
+                throw new Error(data.detail || "Error al cargar datos");
+              }
+
               const ctx = document.getElementById("tempChart").getContext("2d");
               const newChart = new Chart(ctx, {
                 type: "line",
@@ -72,8 +102,20 @@
                 }
               });
               setChart(newChart);
+            })
+            .catch((err) => {
+              console.error("Error al cargar gráfico:", err);
+              setErrorMsg("⚠️ No se pudo cargar la temperatura histórica.");
             });
         }, []);
+
+        // Borrar mensaje de error después de 5 segundos
+        useEffect(() => {
+          if (errorMsg) {
+            const timer = setTimeout(() => setErrorMsg(null), 5000);
+            return () => clearTimeout(timer);
+          }
+        }, [errorMsg]);
 
         return (
           <div>
@@ -84,7 +126,18 @@
               <input type="number" step="0.1" placeholder="Viento km/h" value={wind} onChange={e => setWind(e.target.value)} required />
               <button type="submit">Predecir</button>
             </form>
-            {result && <p><strong>{result}</strong></p>}
+
+            {errorMsg && (
+              <p style={{ color: "red" }}>
+                <strong>{errorMsg}</strong>
+              </p>
+            )}
+
+            {result && (
+              <p style={{ color: "green" }}>
+                <strong>{result}</strong>
+              </p>
+            )}
 
             <h2>Temperatura Promedio Histórica</h2>
             <canvas id="tempChart"></canvas>
@@ -92,6 +145,8 @@
         );
       }
 
+
+      // Renderizar la aplicación
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
   </body>

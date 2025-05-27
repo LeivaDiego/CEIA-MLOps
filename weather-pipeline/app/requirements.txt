@@ -1,0 +1,4 @@
+fastapi             # Framework web
+uvicorn             # Servidor ASGI para FastAPI
+psycopg2-binary     # Conexión a PostgreSQL
+joblib              # Para cargar el modelo .pkl

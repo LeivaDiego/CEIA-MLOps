@@ -222,6 +222,29 @@ services:
       - -c
       - airflow
 
+
+  # --- Servicios de la aplicación ---
+  #   Se utiliza para mostrar la predicción del clima en una interfaz web
+  #   y para interactuar con el modelo de ML
+  weather-app:
+    build: ./app  # Usa el Dockerfile ubicado en /app
+    ports:
+      - "8501:8001"  # Exponemos puerto 8001 interno como 8501 externo (localhost:8501)
+    volumes:
+      - ./shared/models:/app/models:ro  # Modelo .pkl (solo lectura)
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Variables de entorno para la aplicación
+      #   Se utilizan para conectarse a la base de datos PostgreSQL
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: airflow
+      DB_USER: airflow
+      DB_PASS: airflow
+
+
 # Volumenes de datos
 #   Se utilizan para almacenar los datos de la base de datos PostgreSQL y pgAdmin
 #   y se montan en el contenedor

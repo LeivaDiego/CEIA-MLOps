@@ -20,6 +20,13 @@ app.mount("/static", StaticFiles(directory="/app/frontend"), name="static")
 def root():
     return FileResponse("/app/frontend/index.html")
 
+
+# Endpoint de salud para verificar que la API está funcionando
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
 # Endpoint para predicciones con el modelo más reciente válido
 @app.get("/predict")
 def predict(temp: float, humidity: int, wind: float):
@@ -47,6 +54,8 @@ def predict(temp: float, humidity: int, wind: float):
         cur.close()
         conn.close()
 
+        # Si no hay modelos válidos, lanzar excepción
+        # HTTP 404 Not Found
         if not row:
             raise HTTPException(status_code=404, detail="No hay modelos válidos registrados en la base de datos.")
 
@@ -73,6 +82,7 @@ def predict(temp: float, humidity: int, wind: float):
 @app.get("/metrics/temperature")
 def get_temperature_metrics():
     try:
+        # Conectar a PostgreSQL
         conn = psycopg2.connect(
             host=os.environ["DB_HOST"],
             port=os.environ["DB_PORT"],
@@ -80,18 +90,24 @@ def get_temperature_metrics():
             user=os.environ["DB_USER"],
             password=os.environ["DB_PASS"]
         )
+
+        # Obtener datos de temperatura promedio 
         cur = conn.cursor()
         cur.execute("SELECT date, avg_temp_c FROM weather_data ORDER BY date;")
         rows = cur.fetchall()
         cur.close()
         conn.close()
 
+        # Formatear los resultados
         dates = [str(row[0]) for row in rows]
         temps = [row[1] for row in rows]
+
 
         return {
             "dates": dates,
             "avg_temp": temps
         }
+    
+    # Si hay un error al conectar a la base de datos o al ejecutar la consulta
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

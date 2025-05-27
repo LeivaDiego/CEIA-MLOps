@@ -196,8 +196,6 @@ with DAG(
         task_id='trigger_model_monitoring_dag',
         trigger_dag_id='model_monitoring_dag',
         wait_for_completion=False,  # True si quieres que espere respuesta
-        reset_dag_run=True,         # Reinicia si ya existe un run previo
-        execution_date="{{ ds }}",  # Pasa la fecha de ejecución
         trigger_rule="all_success"  # Solo dispara si todas las tareas previas son exitosas
     )
 

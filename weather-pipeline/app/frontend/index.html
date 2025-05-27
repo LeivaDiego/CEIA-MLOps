@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weather Insights</title>
+
+    <!-- Importar React, ReactDOM y Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Importar Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: auto;
+        padding: 1rem;
+      }
+      canvas {
+        margin-top: 2rem;
+        width: 100%;
+        height: 300px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Weather Insights</h1>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [temp, setTemp] = useState('');
+        const [humidity, setHumidity] = useState('');
+        const [wind, setWind] = useState('');
+        const [result, setResult] = useState(null);
+        const [chart, setChart] = useState(null);
+
+        const handlePredict = async (e) => {
+          e.preventDefault();
+          const res = await fetch(`/predict?temp=${temp}&humidity=${humidity}&wind=${wind}`);
+          const data = await res.json();
+          setResult(data.will_it_rain ? "Sí lloverá ☔" : "No lloverá 🌞");
+        };
+
+        useEffect(() => {
+          fetch("/metrics/temperature")
+            .then((res) => res.json())
+            .then((data) => {
+              const ctx = document.getElementById("tempChart").getContext("2d");
+              const newChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                  labels: data.dates,
+                  datasets: [{
+                    label: "Temperatura Promedio (°C)",
+                    data: data.avg_temp,
+                    fill: false,
+                    tension: 0.3
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  scales: {
+                    x: { ticks: { maxTicksLimit: 10 } }
+                  }
+                }
+              });
+              setChart(newChart);
+            });
+        }, []);
+
+        return (
+          <div>
+            <h2>¿Lloverá?</h2>
+            <form onSubmit={handlePredict}>
+              <input type="number" step="0.1" placeholder="Temperatura °C" value={temp} onChange={e => setTemp(e.target.value)} required />
+              <input type="number" placeholder="Humedad %" value={humidity} onChange={e => setHumidity(e.target.value)} required />
+              <input type="number" step="0.1" placeholder="Viento km/h" value={wind} onChange={e => setWind(e.target.value)} required />
+              <button type="submit">Predecir</button>
+            </form>
+            {result && <p><strong>{result}</strong></p>}
+
+            <h2>Temperatura Promedio Histórica</h2>
+            <canvas id="tempChart"></canvas>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,13 +1,11 @@
 # 📚 MLOps: Introducción y Conceptos Fundamentales
 
-
 ## 📝 Descripción
 
 Este documento proporciona una introducción a MLOps (Machine Learning Operations), sus conceptos teóricos, arquitecturas, herramientas y tecnologías relacionadas. Está diseñado para servir como un recurso introductorio y de consulta rápida para nuevos miembros del equipo interesados en la implementación de flujos de trabajo de aprendizaje automático eficientes y escalables.
 
-
-
 ## 📑 Tabla de Contenidos
+
 - [🤖 ¿Qué es MLOps?](#-qué-es-mlops)
 - [🧐 ¿Por qué es importante MLOps?](#-por-qué-es-importante-mlops)
 - [🎯 Ventajas de MLOps](#-ventajas-de-mlops)
@@ -27,8 +25,6 @@ Este documento proporciona una introducción a MLOps (Machine Learning Operation
 - [🚀 Mejores Prácticas](#-mejores-prácticas)
 - [📋 Referencias](#-referencias)
 
-
-
 ## 🤖 ¿Qué es MLOps?
 
 MLOps (Machine Learning Operations) es un conjunto de prácticas y herramientas que permiten gestionar el ciclo de vida completo del aprendizaje automático (ML), desde el desarrollo y entrenamiento de modelos hasta su despliegue, monitorización y mantenimiento en entornos de producción.
@@ -37,21 +33,18 @@ El objetivo principal de MLOps es cerrar la brecha entre los equipos de ciencia 
 
 Además, MLOps facilita la gobernanza de modelos mediante el uso de registros de modelos, seguimiento de metadatos y control de versiones, permitiendo a las organizaciones tomar decisiones más acertadas y a tiempo, basadas en los datos.
 
-
-
 ## 🧐 ¿Por qué es importante MLOps?
 
 MLOps es crucial para garantizar que los modelos de aprendizaje automático se desarrollen, desplieguen y mantengan de forma eficaz, minimizando errores y mejorando la eficiencia. Sin MLOps, las organizaciones pueden enfrentar desafíos como procesos manuales propensos a errores, falta de escalabilidad, baja eficiencia y dificultad en la colaboración entre equipos.
 
 Implementar MLOps permite:
+
 - **Automatización y Eficiencia:** Minimiza errores humanos al automatizar flujos de trabajo y procesos repetitivos.
 - **Escalabilidad:** Facilita el manejo de grandes volúmenes de datos y modelos complejos.
 - **Colaboración Fluida:** Mejora la comunicación entre científicos de datos, ingenieros y operaciones.
 - **Monitoreo y Desempeño Continuo:** Proporciona herramientas para la supervisión en tiempo real de modelos en producción, asegurando predicciones precisas y fiables.
 
 MLOps también ayuda a las organizaciones a alinear los cambios en los modelos de machine learning con las aplicaciones y servicios asociados, permitiendo un ciclo de vida del modelo más dinámico y adaptable.
-
-
 
 ## 🎯 Ventajas de MLOps
 
@@ -65,8 +58,6 @@ MLOps ofrece numerosas ventajas para las organizaciones que buscan optimizar sus
 - **Productividad Aumentada:** Permite a los equipos reutilizar modelos, alternar entre proyectos y acelerar el tiempo de comercialización.
 - **Implementación Sostenable:** Mejora la administración y el monitoreo de modelos en producción, manteniendo un rendimiento óptimo incluso tras actualizaciones o ajustes.
 
-
-
 ## ⚖️ MLOps vs DevOps
 
 Aunque MLOps y DevOps comparten el objetivo de optimizar procesos, tienen diferencias clave:
@@ -76,8 +67,6 @@ Aunque MLOps y DevOps comparten el objetivo de optimizar procesos, tienen difere
 - **Dependencia de Datos:** MLOps debe gestionar grandes volúmenes de datos para el entrenamiento y la inferencia, lo que agrega desafíos adicionales en la administración de datos.
 - **Regulación y Cumplimiento:** Los modelos de ML pueden estar sujetos a regulaciones específicas, impactando su desarrollo y despliegue.
 - **Automatización Específica:** MLOps adapta las mejores prácticas de DevOps al entorno de machine learning, añadiendo componentes como el monitoreo continuo del rendimiento del modelo y su actualización automatizada.
-
-
 
 ## 📚 Principios Fundamentales de MLOps
 
@@ -89,8 +78,6 @@ Los principios fundamentales de MLOps incluyen:
 - **Gobernanza de Modelos:** Asegura la gestión adecuada de los modelos, desde la colaboración hasta la revisión y validación de sesgos y cumplimiento regulatorio.
 - **Principios de Diseño de Software:** Incluye separación de preocupaciones, simplicidad, interfaces bien definidas y adherencia a principios como SOLID.
 
-
-
 ## 💼 Casos de Uso MLOPs
 
 1. **Integración y Despliegue Continuo (CI/CD):** Automatiza el desarrollo y despliegue de modelos, permitiendo iteraciones rápidas y consistentes en sectores como la salud y tecnología.
@@ -98,8 +85,6 @@ Los principios fundamentales de MLOps incluyen:
 3. **Monitoreo y Alertas en Tiempo Real:** Netflix usa MLOps para mantener la calidad de sus recomendaciones mediante la detección temprana de anomalías en sus modelos.
 4. **Gestión de Datos y Gobernanza:** Ocado optimiza la integridad de datos en sus modelos de aprendizaje automático para asegurar experiencias consistentes y de calidad para sus clientes.
 5. **Pruebas Automatizadas y Validación:** En el sector salud, MLOps permite la validación continua de modelos para predicciones de enfermedades y mejora de procesos médicos.
-
-
 
 ## 🚧 Desafíos en la Implementación de MLOps
 
@@ -110,8 +95,6 @@ Los principios fundamentales de MLOps incluyen:
 5. **Brechas de Habilidades:** Formar equipos competentes en MLOps es un desafío debido a la rápida evolución del campo y la escasez de talento calificado.
 6. **Gestión del Cambio y Cultura Organizacional:** Requiere un cambio cultural hacia una mentalidad basada en datos y procesos automatizados.
 7. **Optimización de Costes:** Balancear rendimiento y eficiencia sin exceder los presupuestos en infraestructura y recursos.
-
-
 
 ## 🏛️ Arquitecturas de MLOps
 
@@ -129,7 +112,6 @@ El Nivel 1 introduce la automatización de las canalizaciones de entrenamiento, 
 
 Las organizaciones en el Nivel 2 pueden gestionar múltiples modelos y canalizaciones de ML de forma completamente automatizada. Incluye la integración de orquestadores de canalizaciones, registros de modelos y una infraestructura robusta para soportar la entrega continua de modelos (CI/CD). Este nivel es ideal para empresas tecnológicas que requieren actualizaciones frecuentes y una implementación a gran escala.
 
-
 ### 🔹 Tipos de Arquitectura
 
 #### Arquitectura de Aprendizaje Automático Clásico
@@ -143,8 +125,6 @@ La arquitectura de CV adapta el flujo de trabajo clásico de MLOps para manejar 
 #### Arquitectura de Procesamiento de Lenguaje Natural (NLP)
 
 El flujo de trabajo para NLP se enfoca en procesar datos de texto, desde la tokenización y la normalización hasta la generación de modelos de lenguaje. Esta arquitectura permite a las organizaciones desarrollar aplicaciones como chatbots, análisis de sentimientos y traducción automática, con una infraestructura adaptada para manejar grandes volúmenes de texto no estructurado.
-
-
 
 ## 🚀 Mejores Prácticas
 
@@ -163,8 +143,6 @@ El flujo de trabajo para NLP se enfoca en procesar datos de texto, desde la toke
 7. **Seguridad y Gobernanza de Datos:** Asegurarse de que los datos utilizados cumplan con las normativas de privacidad y seguridad, especialmente en sectores regulados.
 
 8. **Iteración y Mejora Continua:** Fomentar la experimentación y el reentrenamiento de modelos basados en nuevos datos y feedback constante.
-
-
 
 ## 📋 Referencias
 

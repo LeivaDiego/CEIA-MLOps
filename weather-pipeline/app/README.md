@@ -4,7 +4,7 @@
 
 **Weather Insights** es una mini aplicación interactiva que permite a los usuarios ingresar datos meteorológicos (temperatura, humedad y viento) para predecir si lloverá, utilizando un modelo de aprendizaje automático entrenado previamente. Además, presenta un gráfico histórico de temperatura promedio con datos obtenidos de una base de datos PostgreSQL.
 
-![Preview de la App](../screenshots/weather-insights-preview.png)
+![Preview de la App](../screenshots/weather-insights.png)
 
 ## 📑 Tabla de Contenidos
 

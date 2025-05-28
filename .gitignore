@@ -2,8 +2,8 @@
 ## Environments
 .env
 .venv
-env/
-venv/
+env*/
+venv*/
 ENV/
 env.bak/
 venv.bak/
@@ -19,3 +19,6 @@ logs/
 #VSCode
 .vscode/
 .devcontainer/
+
+# Airflow Variables
+variables.json

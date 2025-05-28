@@ -1,5 +1,6 @@
-# MLOPS con 
-![Apache Airflow](https://upload.wikimedia.org/wikipedia/commons/d/de/AirflowLogo.png) 
+# MLOPS con
+
+![Apache Airflow](https://upload.wikimedia.org/wikipedia/commons/d/de/AirflowLogo.png)
 
 ## 📝 Descripción
 
@@ -20,7 +21,7 @@ Este repositorio contiene el progreso y la documentación de mi aprendizaje sobr
 
 ## 📂 Estructura del Repositorio
 
-```
+```text
 workspace/
 ├─ quickstart-airflow/        # Carpeta para el entorno rápido con Apache Airflow
 │   ├─ dags/                  # Ejemplos de DAGs para aprender las Bases de Airflow
@@ -61,5 +62,6 @@ cat README.md
 ```
 
 ## 🔍 Próximos Pasos
+
 - Diseñar Arquitectura MLOPs para proyecto
 - Definir Componentes y flujo de trabajo

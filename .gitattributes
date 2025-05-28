@@ -1,0 +1,32 @@
+# Establece el comportamiento por defecto para todos los archivos
+* text=auto eol=lf
+
+# Archivos de scripts (shell, Python, etc.)
+*.sh text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+
+# Archivos por binarios: no tocar line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.zip binary
+
+# Evita cambios innecesarios en archivos de Docker o Airflow
+Dockerfile text eol=lf
+*.env text eol=lf

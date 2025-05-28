@@ -165,7 +165,7 @@ docker compose up -d
 docker ps
 ```
 
-> [!INFO]
+> [!NOTE]
 > Asegúrate que los contenedores no estén en `starting`. Espera si es necesario.
 
 ## 🔗 Acceder a los Servicios

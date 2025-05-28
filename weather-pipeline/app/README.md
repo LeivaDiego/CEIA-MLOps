@@ -39,7 +39,7 @@ Este archivo define los siguientes endpoints:
 - **`/metrics/temperature`**:
   - Retorna las fechas y temperaturas promedio históricas para graficarlas.
 
-> [!INFO]
+> [!NOTE]
 > El backend se conecta a PostgreSQL usando variables de entorno (`DB_HOST`, `DB_NAME`, etc.).
 
 ### 📁 `/index.html` – Frontend Embebido

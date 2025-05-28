@@ -6,6 +6,17 @@
 
 ![Preview de la App](../screenshots/weather-insights-preview.png)
 
+## 📑 Tabla de Contenidos
+
+- [📝 Descripción](#-descripción)
+- [⚙️ Estructura General](#️-estructura-general)
+- [🧩 Componentes](#-componentes)
+  - [📁 `/main.py` – API Backend con FastAPI](#-mainpy--api-backend-con-fastapi)
+  - [📁 `/index.html` – Frontend Embebido](#-indexhtml--frontend-embebido)
+    - [Funciones](#funciones)
+  - [📄 `requirements.txt`](#-requirementstxt)
+- [🔁 Interacción entre Componentes](#-interacción-entre-componentes)
+
 ## ⚙️ Estructura General
 
 La app está compuesta por dos partes principales:
@@ -19,16 +30,14 @@ La app está compuesta por dos partes principales:
 
 Este archivo define los siguientes endpoints:
 
-* **`/`**: Sirve el archivo `index.html` desde `/app/frontend`.
-* **`/health`**: Verifica si la API está corriendo correctamente.
-* **`/predict?temp=&humidity=&wind=`**:
-
-  * Recibe tres parámetros (`float`, `int`, `float`).
-  * Carga el modelo válido más reciente desde PostgreSQL.
-  * Realiza la predicción y retorna `{"will_it_rain": 0/1}`.
-* **`/metrics/temperature`**:
-
-  * Retorna las fechas y temperaturas promedio históricas para graficarlas.
+- **`/`**: Sirve el archivo `index.html` desde `/app/frontend`.
+- **`/health`**: Verifica si la API está corriendo correctamente.
+- **`/predict?temp=&humidity=&wind=`**:
+  - Recibe tres parámetros (`float`, `int`, `float`).
+  - Carga el modelo válido más reciente desde PostgreSQL.
+  - Realiza la predicción y retorna `{"will_it_rain": 0/1}`.
+- **`/metrics/temperature`**:
+  - Retorna las fechas y temperaturas promedio históricas para graficarlas.
 
 > [!INFO]
 > El backend se conecta a PostgreSQL usando variables de entorno (`DB_HOST`, `DB_NAME`, etc.).
@@ -39,17 +48,15 @@ Archivo HTML que contiene una mini app hecha con **React** y **Chart.js**, carga
 
 #### Funciones
 
-* **Formulario de predicción**:
-
-  * El usuario ingresa temperatura, humedad y velocidad del viento.
-  * Se realiza una petición GET a `/predict`.
-  * El resultado se muestra como:
+- **Formulario de predicción**:
+  - El usuario ingresa temperatura, humedad y velocidad del viento.
+  - Se realiza una petición GET a `/predict`.
+  - El resultado se muestra como:
     `"Sí lloverá ☔"` o `"No lloverá 🌞"`
 
-* **Gráfico de temperatura histórica**:
-
-  * Se consulta `/metrics/temperature`.
-  * Se muestra como un gráfico de líneas usando `Chart.js`.
+- **Gráfico de temperatura histórica**:
+  - Se consulta `/metrics/temperature`.
+  - Se muestra como un gráfico de líneas usando `Chart.js`.
 
 > [!NOTE]
 > Puedes reemplazar el gráfico por otros tipos de métricas fácilmente, solo modificando el endpoint.

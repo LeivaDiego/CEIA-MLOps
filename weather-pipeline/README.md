@@ -176,12 +176,15 @@ docker ps
   Contraseña: `airflow`
 
 * **Mini App (Predicción y visualización)**
-  URL: [http://localhost:8000](http://localhost:8000)
+  URL: [http://localhost:8501](http://localhost:8501)
   No requiere autenticación.
 
 * **pgAdmin (Opcional)**
   URL: [http://localhost:5050](http://localhost:5050)
   Al ingresar por primera vez, se solicitará la contraseña del usuario `admin`. Esta es: `admin`. Puedes marcar la opción para guardar la contraseña.
+  
+> [!NOTE]
+> Si el usuario es `airflow` entonces la contraseña es `airflow`
 
 ## 🖼️ Vista previa
 

@@ -25,7 +25,7 @@ def generate_fernet_key():
             return
         # Sobrescribir línea existente
         updated_lines = [
-            f"AIRFLOW__CORE__FERNET_KEY={key}\n" if line.startswith("AIRFLOW__CORE__FERNET_KEY=") else line
+            f"\nAIRFLOW__CORE__FERNET_KEY=\"{key}\"\n" if line.startswith("AIRFLOW__CORE__FERNET_KEY=") else line
             for line in existing_lines
         ]
         with open(env_path, 'w') as f:
@@ -38,7 +38,7 @@ def generate_fernet_key():
             print("\nINFO | Puedes copiar la clave manualmente y colocarla en un archivo .env")
             return
         # Crear archivo si no existe, o agregar la línea
-        existing_lines.append(f"AIRFLOW__CORE__FERNET_KEY={key}\n")
+        existing_lines.append(f"\nAIRFLOW__CORE__FERNET_KEY=\"{key}\"\n")
         with open(env_path, 'w') as f:
             f.writelines(existing_lines)
         print(f"\nSUCCESS | Clave guardada correctamente en: {env_path}")
